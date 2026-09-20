@@ -14,7 +14,13 @@ import {
   Eye,
   ArrowRight,
   TrendingUp,
-  Settings
+  Settings,
+  Calculator,
+  Layers,
+  HelpCircle,
+  MessageSquare,
+  Award,
+  Image as ImageIcon
 } from 'lucide-react';
 import { SolarService } from '@/lib/services/solar-service';
 import { Enquiry } from '@/lib/types';
@@ -216,6 +222,148 @@ export default function AdminDashboardPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* Admin Modules Directory (Demo Overview) */}
+      <div className="space-y-4 pt-4">
+        <div>
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+            All Admin Management Modules
+          </h2>
+          <p className="text-xs text-slate-500">
+            Quick directory to explore and test all 12 operational modules of the Solaris Admin CMS.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            {
+              title: 'Enquiries & Leads Inbox',
+              desc: 'Review lead inquiries, contact customers via WhatsApp, and manage statuses.',
+              href: '/admin/enquiries',
+              icon: Inbox,
+              badge: `${enquiries.length} leads`,
+              color: 'text-solar-600 bg-solar-50 border-solar-100',
+            },
+            {
+              title: 'Website & Contact Settings',
+              desc: 'Update company name, phone, WhatsApp hotline, address, and social links.',
+              href: '/admin/settings',
+              icon: Settings,
+              badge: 'Config',
+              color: 'text-slate-700 bg-slate-100 border-slate-200',
+            },
+            {
+              title: 'Solar Calculator Engine',
+              desc: 'Edit per-kW costs, monthly unit factors, base grid tariffs, and PM Surya Ghar slabs.',
+              href: '/admin/calculator',
+              icon: Calculator,
+              badge: 'Engine',
+              color: 'text-amber-700 bg-amber-50 border-amber-200',
+            },
+            {
+              title: 'Solar Solutions',
+              desc: 'Manage turnkey solutions: Residential, Commercial, Pumps, and BESS.',
+              href: '/admin/solutions',
+              icon: Layers,
+              badge: 'Catalog',
+              color: 'text-blue-700 bg-blue-50 border-blue-200',
+            },
+            {
+              title: 'Hardware Products',
+              desc: 'Add & update solar panels, on-grid/hybrid inverters, and battery banks.',
+              href: '/admin/products',
+              icon: ShoppingBag,
+              badge: `${productCount} items`,
+              color: 'text-cyan-700 bg-cyan-50 border-cyan-200',
+            },
+            {
+              title: 'Turnkey Packages',
+              desc: 'Configure 3 kW, 5 kW, 10 kW, and 25 kW rooftop packages & pricing.',
+              href: '/admin/packages',
+              icon: Package,
+              badge: `${packageCount} packages`,
+              color: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+            },
+            {
+              title: 'Portfolio Projects',
+              desc: 'Showcase installed solar systems, specifications, savings, and galleries.',
+              href: '/admin/projects',
+              icon: FolderGit2,
+              badge: `${projectCount} projects`,
+              color: 'text-purple-700 bg-purple-50 border-purple-200',
+            },
+            {
+              title: 'Blog & Articles',
+              desc: 'Publish guides on solar policies, net-metering, and technical insights.',
+              href: '/admin/blog',
+              icon: FileText,
+              badge: `${blogCount} posts`,
+              color: 'text-indigo-700 bg-indigo-50 border-indigo-200',
+            },
+            {
+              title: 'Frequently Asked Questions',
+              desc: 'Edit knowledge-base items and answers for the customer FAQ accordion.',
+              href: '/admin/faqs',
+              icon: HelpCircle,
+              badge: 'FAQs',
+              color: 'text-slate-700 bg-slate-50 border-slate-200',
+            },
+            {
+              title: 'Customer Testimonials',
+              desc: 'Manage verified client reviews, star ratings, and project feedback.',
+              href: '/admin/testimonials',
+              icon: MessageSquare,
+              badge: 'Reviews',
+              color: 'text-pink-700 bg-pink-50 border-pink-200',
+            },
+            {
+              title: 'Subsidy Scheme Policy',
+              desc: 'Update official PM Surya Ghar scheme overview, portals, and document lists.',
+              href: '/admin/subsidy',
+              icon: Award,
+              badge: 'PM Surya Ghar',
+              color: 'text-amber-700 bg-amber-50 border-amber-200',
+            },
+            {
+              title: 'Media Library',
+              desc: 'Upload, organize, and view images and visual assets across the site.',
+              href: '/admin/media',
+              icon: ImageIcon,
+              badge: 'Assets',
+              color: 'text-teal-700 bg-teal-50 border-teal-200',
+            },
+          ].map((mod) => {
+            const Icon = mod.icon;
+            return (
+              <Link
+                key={mod.href}
+                href={mod.href}
+                className="p-5 bg-white rounded-2xl border border-slate-200 hover:border-solar-300 hover:shadow-md transition-all flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center border ${mod.color}`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                      {mod.badge}
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-900 group-hover:text-solar-600 transition-colors">
+                    {mod.title}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">
+                    {mod.desc}
+                  </p>
+                </div>
+                <div className="flex items-center text-xs font-semibold text-solar-600 mt-4 group-hover:translate-x-1 transition-transform">
+                  Open module <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </div>

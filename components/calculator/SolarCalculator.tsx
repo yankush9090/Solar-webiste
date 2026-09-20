@@ -178,8 +178,8 @@ export default function SolarCalculator({
                   type="button"
                   onClick={() => setPropertyType(type)}
                   className={`py-2 px-3 text-xs font-bold rounded-xl border text-center transition-all ${propertyType === type
-                      ? 'bg-solar-600 text-white border-solar-600 shadow-sm'
-                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                    ? 'bg-solar-600 text-white border-solar-600 shadow-sm'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                     }`}
                 >
                   {type}
@@ -204,8 +204,8 @@ export default function SolarCalculator({
                   type="button"
                   onClick={() => setSystemType(sys.id as any)}
                   className={`py-2 px-2 text-center rounded-xl border transition-all ${systemType === sys.id
-                      ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
-                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                    ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                     }`}
                 >
                   <p className="text-xs font-bold">{sys.label}</p>

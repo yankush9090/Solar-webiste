@@ -105,7 +105,27 @@ export default function AdminLoginPage() {
           >
             {loading ? 'Authenticating...' : 'Sign In to Dashboard'}
           </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              sessionStorage.setItem('solaris_admin_authenticated', 'true');
+              sessionStorage.setItem('solaris_admin_email', 'admin@solarisenergy.com');
+              router.push('/admin');
+            }}
+            className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 hover:border-amber-500/50 font-semibold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2"
+          >
+            <ShieldCheck className="w-4 h-4 text-amber-400" />
+            Instant Demo Access (1-Click Login)
+          </button>
         </form>
+
+        <div className="p-3 bg-slate-800/60 border border-slate-700/60 rounded-xl text-center space-y-1">
+          <p className="text-[11px] font-semibold text-amber-300">Demo Admin Credentials</p>
+          <p className="text-[10px] text-slate-400 font-mono">
+            admin@solarisenergy.com • solaradmin2025
+          </p>
+        </div>
 
         <div className="pt-2 border-t border-slate-800 text-center">
           <Link href="/" className="text-xs text-slate-400 hover:text-white transition-colors block">

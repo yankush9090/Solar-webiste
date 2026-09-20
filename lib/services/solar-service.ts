@@ -1,10 +1,21 @@
 import * as actions from '../db/actions';
 import { calculateSolar } from '../calculator';
+import {
+  Solution,
+  Product,
+  Package,
+  Project,
+  Testimonial,
+  FAQ,
+  BlogPost,
+  Enquiry,
+} from '../types';
 
 export const SolarService = {
   // Settings & Stats
   getSettings: actions.getSettingsAction,
   saveSettings: actions.saveSettingsAction,
+  updateSettings: actions.saveSettingsAction,
   getStats: actions.getStatsAction,
 
   // Solutions
@@ -13,7 +24,10 @@ export const SolarService = {
     const list = await actions.getSolutionsAction();
     return list.find((s) => s.slug === slug) || null;
   },
-  saveSolution: actions.saveSolutionAction,
+  saveSolution: async (solution: Solution): Promise<Solution[]> => {
+    await actions.saveSolutionAction(solution);
+    return actions.getSolutionsAction();
+  },
 
   // Products
   getProductCategories: actions.getProductCategoriesAction,
@@ -22,7 +36,10 @@ export const SolarService = {
     const list = await actions.getProductsAction();
     return list.find((p) => p.slug === slug) || null;
   },
-  saveProduct: actions.saveProductAction,
+  saveProduct: async (product: Product): Promise<Product[]> => {
+    await actions.saveProductAction(product);
+    return actions.getProductsAction();
+  },
 
   // Packages
   getPackages: actions.getPackagesAction,
@@ -30,7 +47,10 @@ export const SolarService = {
     const list = await actions.getPackagesAction();
     return list.find((p) => p.slug === slug) || null;
   },
-  savePackage: actions.savePackageAction,
+  savePackage: async (pkg: Package): Promise<Package[]> => {
+    await actions.savePackageAction(pkg);
+    return actions.getPackagesAction();
+  },
 
   // Projects
   getProjects: actions.getProjectsAction,
@@ -38,13 +58,22 @@ export const SolarService = {
     const list = await actions.getProjectsAction();
     return list.find((p) => p.slug === slug) || null;
   },
-  saveProject: actions.saveProjectAction,
+  saveProject: async (proj: Project): Promise<Project[]> => {
+    await actions.saveProjectAction(proj);
+    return actions.getProjectsAction();
+  },
 
   // Testimonials & FAQs
   getTestimonials: actions.getTestimonialsAction,
-  saveTestimonial: actions.saveTestimonialAction,
+  saveTestimonial: async (testimonial: Testimonial): Promise<Testimonial[]> => {
+    await actions.saveTestimonialAction(testimonial);
+    return actions.getTestimonialsAction();
+  },
   getFAQs: actions.getFaqsAction,
-  saveFAQ: actions.saveFaqAction,
+  saveFAQ: async (faq: FAQ): Promise<FAQ[]> => {
+    await actions.saveFaqAction(faq);
+    return actions.getFaqsAction();
+  },
 
   // Blog
   getBlogPosts: actions.getBlogPostsAction,
@@ -52,22 +81,34 @@ export const SolarService = {
     const list = await actions.getBlogPostsAction();
     return list.find((b) => b.slug === slug) || null;
   },
-  saveBlogPost: actions.saveBlogPostAction,
+  saveBlogPost: async (post: BlogPost): Promise<BlogPost[]> => {
+    await actions.saveBlogPostAction(post);
+    return actions.getBlogPostsAction();
+  },
 
   // Subsidy & Financing
   getSubsidy: actions.getSubsidyAction,
   saveSubsidy: actions.saveSubsidyAction,
+  updateSubsidy: actions.saveSubsidyAction,
   getFinancing: actions.getFinancingAction,
 
   // Calculator
   getCalculatorSettings: actions.getCalculatorSettingsAction,
   saveCalculatorSettings: actions.saveCalculatorSettingsAction,
+  updateCalculatorSettings: actions.saveCalculatorSettingsAction,
   getCalculatorSlabs: actions.getCalculatorSlabsAction,
   calculateSolar,
 
   // Enquiries
   submitEnquiry: actions.submitEnquiryAction,
   getEnquiries: actions.getEnquiriesAction,
-  updateEnquiryStatus: actions.updateEnquiryStatusAction,
-  deleteEnquiry: actions.deleteEnquiryAction,
+  updateEnquiryStatus: async (id: string, status: Enquiry['status']): Promise<Enquiry[]> => {
+    await actions.updateEnquiryStatusAction(id, status);
+    return actions.getEnquiriesAction();
+  },
+  deleteEnquiry: async (id: string): Promise<Enquiry[]> => {
+    await actions.deleteEnquiryAction(id);
+    return actions.getEnquiriesAction();
+  },
 };
+
