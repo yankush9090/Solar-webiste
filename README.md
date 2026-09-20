@@ -306,5 +306,3 @@ The PM Surya Ghar calculation logic implemented in [`lib/calculator.ts`](file://
 ## 📄 License
 
 This project is proprietary software developed for **Solaris Energy Solutions**. All rights reserved.
-#   S o l a r - w e b i s t e -  
- 
