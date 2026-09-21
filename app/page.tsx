@@ -29,7 +29,9 @@ import {
   getTestimonialsAction,
   getFaqsAction,
   getBlogPostsAction,
-  getStatsAction
+  getStatsAction,
+  getCalculatorSettingsAction,
+  getSettingsAction
 } from '@/lib/db/actions';
 import {
   INITIAL_SOLUTIONS,
@@ -38,11 +40,15 @@ import {
   INITIAL_TESTIMONIALS,
   INITIAL_FAQS,
   INITIAL_BLOG_POSTS,
-  INITIAL_STATS
+  INITIAL_STATS,
+  INITIAL_CALCULATOR_SETTINGS,
+  INITIAL_SITE_SETTINGS
 } from '@/lib/data/initial-data';
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
-  const [solutions, packages, projects, testimonials, faqs, blogPosts, stats] = await Promise.all([
+  const [solutions, packages, projects, testimonials, faqs, blogPosts, stats, calcSettings, siteSettings] = await Promise.all([
     getSolutionsAction().catch(() => INITIAL_SOLUTIONS),
     getPackagesAction().catch(() => INITIAL_PACKAGES),
     getProjectsAction().catch(() => INITIAL_PROJECTS),
@@ -50,121 +56,71 @@ export default async function HomePage() {
     getFaqsAction().catch(() => INITIAL_FAQS),
     getBlogPostsAction().catch(() => INITIAL_BLOG_POSTS),
     getStatsAction().catch(() => INITIAL_STATS),
+    getCalculatorSettingsAction().catch(() => INITIAL_CALCULATOR_SETTINGS),
+    getSettingsAction().catch(() => INITIAL_SITE_SETTINGS),
   ]);
 
   return (
     <div className="space-y-16 sm:space-y-24">
-      <section className="relative overflow-hidden bg-slate-950 text-white pt-16 pb-24 sm:pt-24 sm:pb-32">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-7 space-y-6 text-left">
-              <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-amber-400 text-xs font-semibold">
-                <Zap className="w-3.5 h-3.5 fill-amber-400" />
-                <span>Central Subsidy up to ₹78,000 under PM Surya Ghar</span>
-              </div>
-
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1]">
-                Rooftop Solar EPC & <span className="text-solar-400">Clean Energy Systems</span>
-              </h1>
-
-              <p className="text-base sm:text-lg text-slate-300 max-w-xl leading-relaxed">
-                Turnkey residential and commercial rooftop solar installations with DISCOM net metering changeovers, Tier-1 bifacial modules, and direct PM Surya Ghar subsidy disbursement.
-              </p>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-3.5 pt-2">
-                <Link
-                  href="/solar-calculator"
-                  className="px-6 py-3.5 rounded-xl text-sm font-bold text-slate-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 shadow-lg shadow-amber-500/20 transition-all flex items-center group"
-                >
-                  <Calculator className="w-4 h-4 mr-2" />
-                  Calculate Savings & Subsidy
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Link>
-
-                <Link
-                  href="/contact"
-                  className="px-6 py-3.5 rounded-xl text-sm font-bold text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700 transition-all flex items-center"
-                >
-                  Get Free Site Survey
-                </Link>
-
-                <a
-                  href="https://wa.me/919876543210?text=Hello%2C%20I%20am%20interested%20in%20solar%20installation%20for%20my%20property."
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-3.5 rounded-xl text-sm font-bold text-emerald-400 bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-800/60 transition-all flex items-center"
-                >
-                  <MessageCircle className="w-4 h-4 mr-2 text-emerald-400 fill-emerald-400" />
-                  Chat on WhatsApp
-                </a>
-              </div>
-
-              {/* Mini trust checklist */}
-              <div className="pt-4 border-t border-slate-800/80 grid grid-cols-3 gap-3 text-xs text-slate-300 font-medium">
-                <span className="flex items-center">
-                  <CheckCircle2 className="w-4 h-4 text-solar-400 mr-1.5 shrink-0" />
-                  25-Yr Performance Guarantee
-                </span>
-                <span className="flex items-center">
-                  <CheckCircle2 className="w-4 h-4 text-solar-400 mr-1.5 shrink-0" />
-                  Net Metering Assistance
-                </span>
-                <span className="flex items-center">
-                  <CheckCircle2 className="w-4 h-4 text-solar-400 mr-1.5 shrink-0" />
-                  Zero-Cost EMI Available
-                </span>
-              </div>
-            </div>
-
-            {/* Right Visual Card */}
-            <div className="lg:col-span-5 relative">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-800 bg-slate-900">
-                <img
-                  src="https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&q=80"
-                  alt="Modern rooftop solar installation"
-                  className="w-full h-80 sm:h-96 object-cover opacity-90 hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-
-                {/* Floating pill stats on hero image */}
-                <div className="absolute bottom-4 left-4 right-4 bg-slate-900/90 backdrop-blur-md p-4 rounded-2xl border border-slate-700/80 text-white">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-slate-400">Average Rooftop ROI</p>
-                      <p className="text-xl font-black text-amber-400">3.2 Years</p>
-                    </div>
-                    <div className="h-8 w-px bg-slate-800" />
-                    <div>
-                      <p className="text-xs text-slate-400">Monthly Bill Cut</p>
-                      <p className="text-xl font-black text-emerald-400">Up to 90%</p>
-                    </div>
-                    <div className="h-8 w-px bg-slate-800" />
-                    <div>
-                      <p className="text-xs text-slate-400">Direct Subsidy</p>
-                      <p className="text-xl font-black text-white">₹78,000</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* Hero Section: Solar Greenery with Full-Bleed Background */}
+      <section className="relative overflow-hidden min-h-[560px] sm:min-h-[640px] lg:min-h-[720px] flex items-center text-white">
+        {/* Full-bleed background image with responsive positioning */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/images/solar-maati-hero.jpg"
+            alt="Maati Energy - Power your home, grow with the sun"
+            className="w-full h-full object-cover object-top sm:object-center"
+          />
+          {/* Subtle natural gradient overlays for crisp readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/45 to-transparent sm:via-slate-950/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/25" />
+          <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-slate-50 via-slate-50/40 to-transparent pointer-events-none" />
         </div>
-      </section>
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 sm:-mt-16 relative z-10">
-        <div className="bg-white rounded-3xl shadow-xl border border-slate-200/80 p-6 sm:p-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center divide-y md:divide-y-0 md:divide-x divide-slate-100">
-            {stats.map((stat, idx) => (
-              <div key={stat.id} className={idx > 0 ? 'pt-4 md:pt-0' : ''}>
-                <p className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
-                  {stat.value}
-                </p>
-                <p className="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider mt-1">
-                  {stat.label}
-                </p>
-              </div>
-            ))}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
+          <div className="max-w-3xl space-y-6">
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08] text-white drop-shadow-md">
+              Power your home.{' '}
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-200 to-yellow-400">
+                Grow with the sun.
+              </span>
+            </h1>
+
+            <p className="text-base sm:text-lg text-slate-100 leading-relaxed font-medium max-w-2xl drop-shadow">
+              Thoughtfully engineered solar solutions for homes, farms, businesses and institutions — from site
+              assessment to installation, net metering and after-sales support.
+            </p>
+
+            <div className="pt-2 flex flex-wrap gap-4">
+              <Link
+                href="/solar-calculator"
+                className="px-7 py-3.5 rounded-full text-sm sm:text-base font-bold text-[#14532d] bg-white hover:bg-slate-100 shadow-2xl transition-all hover:scale-105"
+              >
+                Get a Solar Assessment
+              </Link>
+              <Link
+                href="/solutions"
+                className="px-7 py-3.5 rounded-full text-sm sm:text-base font-semibold text-white bg-black/40 hover:bg-black/60 border border-white/40 backdrop-blur-md transition-all hover:scale-105"
+              >
+                Explore Solutions
+              </Link>
+            </div>
+
+            {/* Quick credibility checklist */}
+            <div className="pt-4 flex flex-wrap items-center gap-4 sm:gap-6 text-xs sm:text-sm text-slate-200 font-medium drop-shadow-sm">
+              <span className="flex items-center">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 mr-1.5 shrink-0" />
+                PM Surya Ghar Subsidy up to ₹78,000
+              </span>
+              <span className="flex items-center">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 mr-1.5 shrink-0" />
+                Up to 90% Bill Savings
+              </span>
+              <span className="flex items-center">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 mr-1.5 shrink-0" />
+                25-Yr Linear Power Warranty
+              </span>
+            </div>
           </div>
         </div>
       </section>
@@ -235,58 +191,62 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="bg-slate-900 text-white py-16 sm:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="bg-gradient-to-b from-[#092a1d] via-[#0d3b2b] to-[#092a1d] text-white py-16 sm:py-24 relative overflow-hidden">
+        {/* Natural ambient glows */}
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-14">
-            <span className="text-xs font-bold text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full uppercase tracking-wider">
-              Smart Investment
+            <span className="text-xs font-bold text-emerald-300 bg-emerald-900/60 border border-emerald-500/30 px-3.5 py-1 rounded-full uppercase tracking-wider">
+              Solar Savings & Protection
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-white mt-2">
-              Why Transition to Solar Power Today?
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mt-3 tracking-tight">
+              Why Solar Power is the Smartest Investment for Your Home
             </h2>
-            <p className="text-slate-400 text-sm mt-2">
-              Solar is not just an eco-friendly choice; it is one of the highest-yielding financial assets available.
+            <p className="text-slate-300 text-sm sm:text-base mt-3 max-w-2xl mx-auto leading-relaxed">
+              Solar is not just clean energy; it delivers immediate monthly bill freedom, reliable power, and a direct boost to your family savings.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-slate-800/70 p-6 rounded-2xl border border-slate-700/80 space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+            <div className="bg-white/5 backdrop-blur-sm p-6 rounded-3xl border border-white/10 space-y-3 hover:bg-white/10 hover:border-emerald-500/40 transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
                 <TrendingUp className="w-6 h-6" />
               </div>
-              <h4 className="text-lg font-bold text-white">Up to 30% Annual ROI</h4>
+              <h4 className="text-lg font-bold text-white">Up to 90% Bill Elimination</h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Outperforms fixed deposits and mutual funds with guaranteed bill elimination and 3 to 4 year complete capital payback.
+                Generate your own clean units every sunny day. Most homeowners recover their entire setup cost within 3 to 4 years.
               </p>
             </div>
 
-            <div className="bg-slate-800/70 p-6 rounded-2xl border border-slate-700/80 space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-solar-500/20 text-solar-400 flex items-center justify-center">
+            <div className="bg-white/5 backdrop-blur-sm p-6 rounded-3xl border border-white/10 space-y-3 hover:bg-white/10 hover:border-emerald-500/40 transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
                 <Zap className="w-6 h-6" />
               </div>
-              <h4 className="text-lg font-bold text-white">Direct Govt Subsidy</h4>
+              <h4 className="text-lg font-bold text-white">Direct Govt Subsidy (₹78k)</h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Take advantage of ₹30,000 to ₹78,000 cash subsidy under PM Surya Ghar directly transferred to your bank account.
+                Get up to ₹78,000 Central Financial Assistance under PM Surya Ghar directly credited into your savings account.
               </p>
             </div>
 
-            <div className="bg-slate-800/70 p-6 rounded-2xl border border-slate-700/80 space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
+            <div className="bg-white/5 backdrop-blur-sm p-6 rounded-3xl border border-white/10 space-y-3 hover:bg-white/10 hover:border-emerald-500/40 transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-solar-400/20 text-solar-300 flex items-center justify-center">
                 <ShieldCheck className="w-6 h-6" />
               </div>
-              <h4 className="text-lg font-bold text-white">25-Year Protection</h4>
+              <h4 className="text-lg font-bold text-white">25-Year Generational Power</h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Tier-1 N-Type TOPCon bifacial modules with linear power warranties ensuring high output through decade three.
+                Tier-1 N-Type TOPCon bifacial modules designed with high-durability hot-dip galvanized structures built for 25+ years.
               </p>
             </div>
 
-            <div className="bg-slate-800/70 p-6 rounded-2xl border border-slate-700/80 space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+            <div className="bg-white/5 backdrop-blur-sm p-6 rounded-3xl border border-white/10 space-y-3 hover:bg-white/10 hover:border-emerald-500/40 transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-amber-400/20 text-amber-300 flex items-center justify-center">
                 <Sun className="w-6 h-6" />
               </div>
               <h4 className="text-lg font-bold text-white">Hedge Rising Tariffs</h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Grid power rates increase 5–7% annually. Solar freezes your cost of power at virtually zero for the next 25 years.
+                Electricity grid tariffs rise 5–7% every single year. Solar locks in your electricity price at virtually ₹0 for 25 years.
               </p>
             </div>
           </div>
@@ -294,7 +254,7 @@ export default async function HomePage() {
       </section>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SolarCalculator />
+        <SolarCalculator initialSettings={calcSettings} whatsappNumber={siteSettings.whatsapp_number} />
       </section>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -629,7 +589,7 @@ export default async function HomePage() {
                 Schedule Free Site Inspection
               </Link>
               <a
-                href="https://wa.me/919876543210?text=Hello%2C%20I%20would%20like%20to%20schedule%20a%20solar%20site%20inspection."
+                href="https://wa.me/917849067305?text=Hello%2C%20I%20would%20like%20to%20schedule%20a%20solar%20site%20inspection."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-6 py-3.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow transition-all flex items-center"

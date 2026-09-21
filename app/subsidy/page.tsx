@@ -9,6 +9,7 @@ import {
   Phone,
   ArrowRight
 } from 'lucide-react';
+import { getSubsidyAction } from '@/lib/db/actions';
 import { INITIAL_SUBSIDY } from '@/lib/data/initial-data';
 
 export const metadata = {
@@ -16,8 +17,10 @@ export const metadata = {
   description: 'Complete guide to the Central Government PM Surya Ghar rooftop solar subsidy. Slabs, eligibility rules, required documents, and application process.',
 };
 
-export default function SubsidyPage() {
-  const sub = INITIAL_SUBSIDY;
+export const dynamic = 'force-dynamic';
+
+export default async function SubsidyPage() {
+  const sub = await getSubsidyAction().catch(() => INITIAL_SUBSIDY);
 
   return (
     <div className="space-y-16 py-12">

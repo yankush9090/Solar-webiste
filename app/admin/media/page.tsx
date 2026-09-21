@@ -10,18 +10,11 @@ import {
   UploadCloud,
   ExternalLink,
   Search,
-  Filter,
-  Check,
   Sparkles,
-  Layers,
   AlertCircle
 } from 'lucide-react';
+import { SolarService } from '@/lib/services/solar-service';
 import { MediaItem } from '@/lib/types';
-import {
-  getMediaItemsAction,
-  saveMediaItemAction,
-  deleteMediaItemAction
-} from '@/lib/db/actions';
 import { INITIAL_MEDIA_ITEMS } from '@/lib/data/initial-data';
 
 const CATEGORIES = [
@@ -60,7 +53,7 @@ export default function AdminMediaPage() {
 
   // Load media items from database / server actions
   useEffect(() => {
-    getMediaItemsAction()
+    SolarService.getMediaItems()
       .then((items) => {
         if (items && items.length > 0) {
           setMedia(items);
@@ -99,7 +92,7 @@ export default function AdminMediaPage() {
     };
 
     setMedia((prev) => [item, ...prev]);
-    await saveMediaItemAction(item);
+    await SolarService.saveMediaItem(item);
 
     setNewUrl('');
     setNewName('');
@@ -160,7 +153,7 @@ export default function AdminMediaPage() {
       };
 
       setMedia((prev) => [newItem, ...prev]);
-      await saveMediaItemAction(newItem);
+      await SolarService.saveMediaItem(newItem);
 
       // Reset
       setSelectedFile(null);
@@ -177,7 +170,7 @@ export default function AdminMediaPage() {
   const handleDelete = async (id: string, name: string) => {
     if (!confirm(`Are you sure you want to remove "${name}" from the media library?`)) return;
     setMedia((prev) => prev.filter((m) => m.id !== id));
-    await deleteMediaItemAction(id);
+    await SolarService.deleteMediaItem(id);
   };
 
   // Filtered media items

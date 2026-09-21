@@ -1,6 +1,15 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { query, isPostgresConfigured } from './pool';
+
+function purgeCache() {
+  try {
+    revalidatePath('/', 'layout');
+  } catch (err) {
+    // Ignore in non-request contexts
+  }
+}
 import {
   SiteSettings,
   HomepageStat,
@@ -53,12 +62,16 @@ export async function saveSettingsAction(settings: Partial<SiteSettings>): Promi
   if (isPostgresConfigured()) {
     await query(
       `INSERT INTO site_settings (
-        id, company_name, tagline, phone_number, whatsapp_number, email, address, working_hours,
+        id, company_name, tagline, logo_url, favicon_url, google_maps_url,
+        phone_number, whatsapp_number, email, address, working_hours,
         facebook_url, instagram_url, linkedin_url, youtube_url, updated_at
-      ) VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
+      ) VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW())
       ON CONFLICT (id) DO UPDATE SET
         company_name = EXCLUDED.company_name,
         tagline = EXCLUDED.tagline,
+        logo_url = EXCLUDED.logo_url,
+        favicon_url = EXCLUDED.favicon_url,
+        google_maps_url = EXCLUDED.google_maps_url,
         phone_number = EXCLUDED.phone_number,
         whatsapp_number = EXCLUDED.whatsapp_number,
         email = EXCLUDED.email,
@@ -72,6 +85,9 @@ export async function saveSettingsAction(settings: Partial<SiteSettings>): Promi
       [
         settings.company_name,
         settings.tagline,
+        settings.logo_url || '/images/logo.png',
+        settings.favicon_url || '/favicon.ico',
+        settings.google_maps_url || 'https://maps.google.com',
         settings.phone_number,
         settings.whatsapp_number,
         settings.email,
@@ -84,6 +100,7 @@ export async function saveSettingsAction(settings: Partial<SiteSettings>): Promi
       ]
     );
   }
+  purgeCache();
   return { ...INITIAL_SITE_SETTINGS, ...settings, updated_at: new Date().toISOString() };
 }
 
@@ -142,6 +159,7 @@ export async function saveSolutionAction(solution: Solution): Promise<void> {
       ]
     );
   }
+  purgeCache();
 }
 
 // PRODUCTS & CATEGORIES
@@ -206,6 +224,7 @@ export async function saveProductAction(product: Product): Promise<void> {
       ]
     );
   }
+  purgeCache();
 }
 
 // PACKAGES
@@ -258,6 +277,7 @@ export async function savePackageAction(pkg: Package): Promise<void> {
       ]
     );
   }
+  purgeCache();
 }
 
 // PROJECTS
@@ -308,6 +328,7 @@ export async function saveProjectAction(project: Project): Promise<void> {
       ]
     );
   }
+  purgeCache();
 }
 
 // TESTIMONIALS & FAQS
@@ -334,6 +355,7 @@ export async function saveTestimonialAction(t: Testimonial): Promise<void> {
       [t.id, t.customer_name, t.location, t.photo_url || null, t.review, t.rating || 5, t.project_info || null, t.display_order || 0, t.active ?? true]
     );
   }
+  purgeCache();
 }
 
 export async function getFaqsAction(): Promise<FAQ[]> {
@@ -358,6 +380,7 @@ export async function saveFaqAction(f: FAQ): Promise<void> {
       [f.id, f.question, f.answer, f.category, f.display_order || 0, f.active ?? true]
     );
   }
+  purgeCache();
 }
 
 // BLOG POSTS
@@ -403,6 +426,7 @@ export async function saveBlogPostAction(b: BlogPost): Promise<void> {
       ]
     );
   }
+  purgeCache();
 }
 
 // SUBSIDY & FINANCING
@@ -419,16 +443,18 @@ export async function getSubsidyAction(): Promise<SubsidyScheme> {
 export async function saveSubsidyAction(s: Partial<SubsidyScheme>): Promise<SubsidyScheme> {
   if (isPostgresConfigured()) {
     await query(
-      `UPDATE subsidy_schemes SET
-        name = COALESCE($1, name),
-        overview = COALESCE($2, overview),
-        notes = COALESCE($3, notes),
-        portal_url = COALESCE($4, portal_url),
-        last_updated = CURRENT_DATE
-       WHERE id = 'sub-pmsuryaghar'`,
+      `INSERT INTO subsidy_schemes (id, name, slug, overview, notes, portal_url, last_updated, active)
+       VALUES ('sub-pmsuryaghar', $1, 'pm-surya-ghar', $2, $3, $4, CURRENT_DATE, true)
+       ON CONFLICT (id) DO UPDATE SET
+        name = COALESCE($1, subsidy_schemes.name),
+        overview = COALESCE($2, subsidy_schemes.overview),
+        notes = COALESCE($3, subsidy_schemes.notes),
+        portal_url = COALESCE($4, subsidy_schemes.portal_url),
+        last_updated = CURRENT_DATE`,
       [s.name, s.overview, s.notes, s.portal_url]
     );
   }
+  purgeCache();
   return { ...INITIAL_SUBSIDY, ...s, last_updated: new Date().toISOString().split('T')[0] };
 }
 
@@ -467,6 +493,7 @@ export async function saveCalculatorSettingsAction(c: Partial<CalculatorSettings
       [c.cost_per_kw, c.generation_per_kw_per_month, c.default_tariff, c.co2_factor, c.maintenance_percent || 1.5]
     );
   }
+  purgeCache();
   return { ...INITIAL_CALCULATOR_SETTINGS, ...c };
 }
 
@@ -526,12 +553,14 @@ export async function updateEnquiryStatusAction(id: string, status: Enquiry['sta
   if (isPostgresConfigured()) {
     await query('UPDATE enquiries SET status = $1, updated_at = NOW() WHERE id = $2', [status, id]);
   }
+  purgeCache();
 }
 
 export async function deleteEnquiryAction(id: string): Promise<void> {
   if (isPostgresConfigured()) {
     await query('DELETE FROM enquiries WHERE id = $1', [id]);
   }
+  purgeCache();
 }
 
 // ADMIN AUTHENTICATION
@@ -621,6 +650,7 @@ export async function saveMediaItemAction(item: MediaItem): Promise<{ success: b
   } else {
     _localMediaItems = [item, ..._localMediaItems];
   }
+  purgeCache();
   return { success: true, item };
 }
 
@@ -633,6 +663,7 @@ export async function deleteMediaItemAction(id: string): Promise<{ success: bool
     }
   }
   _localMediaItems = _localMediaItems.filter(m => m.id !== id);
+  purgeCache();
   return { success: true };
 }
 

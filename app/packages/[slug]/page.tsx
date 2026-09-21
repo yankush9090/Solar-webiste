@@ -47,7 +47,7 @@ export default function PackageDetailPage() {
   const netAfterSubsidy = Math.max(effectiveCost - (pkg.estimated_subsidy || 0), 0);
 
   const whatsappMsg = `Hello Solaris Team, I am interested in booking/inquiring about the ${pkg.name} (${pkg.capacity} ${pkg.system_type}). Please share site survey availability.`;
-  const whatsappUrl = `https://wa.me/919876543210?text=${encodeURIComponent(whatsappMsg)}`;
+  const whatsappUrl = `https://wa.me/917849067305?text=${encodeURIComponent(whatsappMsg)}`;
 
   return (
     <div className="space-y-16 py-12">

@@ -3,9 +3,10 @@ import './globals.css';
 import AppShell from '@/components/layout/AppShell';
 
 export const metadata: Metadata = {
-  title: 'Solaris Energy Solutions | Turnkey Solar EPC, Rooftop & Commercial Solar',
+  title: 'Maati Energy | Sustainable. Smart. Indian. — Turnkey Solar EPC & Rooftop Solar',
   description: 'Leading solar energy EPC contractor. Residential rooftop solar, commercial solar installations, PM Surya Ghar subsidy up to ₹78,000, and intelligent energy storage solutions.',
   keywords: [
+    'Maati Energy',
     'Solar Rooftop',
     'PM Surya Ghar Subsidy',
     'Residential Solar',
@@ -15,12 +16,12 @@ export const metadata: Metadata = {
     'Hybrid Solar Inverter',
     'Solar EPC'
   ],
-  authors: [{ name: 'Solaris Energy Solutions' }],
+  authors: [{ name: 'Maati Energy' }],
   openGraph: {
-    title: 'Solaris Energy Solutions | Powering Clean Sustainable Energy',
+    title: 'Maati Energy | Sustainable. Smart. Indian.',
     description: 'Slash your electricity bills up to 90% with turnkey solar rooftop installations and direct bank subsidies.',
-    url: 'https://solarisenergy.com',
-    siteName: 'Solaris Energy',
+    url: 'https://maatienergy.com',
+    siteName: 'Maati Energy',
     type: 'website',
   },
 };

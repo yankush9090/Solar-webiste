@@ -132,7 +132,7 @@ export default function FaqPage() {
           </p>
           <div className="flex justify-center gap-3 pt-2">
             <a
-              href="https://wa.me/919876543210?text=Hello%2C%20I%20have%20a%20question%20about%20solar."
+              href="https://wa.me/917849067305?text=Hello%2C%20I%20have%20a%20question%20about%20solar."
               target="_blank"
               rel="noopener noreferrer"
               className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center shadow"

@@ -62,15 +62,27 @@ export default function Footer({ settings = INITIAL_SITE_SETTINGS }: FooterProps
           {/* Col 1: Brand & Bio */}
           <div className="lg:col-span-2 space-y-4">
             <Link href="/" className="flex items-center space-x-2.5">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-solar-500 to-amber-400 flex items-center justify-center text-white shadow-md">
-                <Sun className="w-6 h-6" />
-              </div>
-              <span className="text-xl font-black text-white tracking-tight">
-                SOLARIS <span className="text-solar-400 text-sm font-semibold">ENERGY</span>
-              </span>
+              {settings.logo_url ? (
+                <div className="bg-white p-1.5 rounded-xl inline-block shadow-sm">
+                  <img
+                    src={settings.logo_url}
+                    alt={settings.company_name || 'Maati Energy'}
+                    className="h-10 sm:h-12 w-auto max-w-[200px] object-contain"
+                  />
+                </div>
+              ) : (
+                <>
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-solar-500 to-amber-400 flex items-center justify-center text-white shadow-md">
+                    <Sun className="w-6 h-6" />
+                  </div>
+                  <span className="text-xl font-black text-white tracking-tight">
+                    {settings.company_name || 'MAATI ENERGY'}
+                  </span>
+                </>
+              )}
             </Link>
             <p className="text-sm leading-relaxed text-slate-400 max-w-sm">
-              Solaris Energy Solutions is a premier EPC contractor delivering turnkey rooftop and utility-scale solar installations across residential, commercial, industrial, and agricultural sectors.
+              {settings.company_name || 'Maati Energy'} is a premier EPC contractor delivering turnkey rooftop and utility-scale solar installations across residential, commercial, industrial, and agricultural sectors.
             </p>
             <div className="flex items-center space-x-3 pt-2">
               {settings.facebook_url && (
@@ -237,7 +249,7 @@ export default function Footer({ settings = INITIAL_SITE_SETTINGS }: FooterProps
         <div className="mt-6 pt-6 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
           <p>© {new Date().getFullYear()} {settings.company_name}. All rights reserved.</p>
           <div className="flex items-center space-x-6">
-            <Link href="/privacy" className="hover:text-slate-400 transition-colors">
+            <Link href="/privacy-policy" className="hover:text-slate-400 transition-colors">
               Privacy Policy
             </Link>
             <Link href="/terms" className="hover:text-slate-400 transition-colors">

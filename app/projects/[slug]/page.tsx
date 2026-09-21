@@ -46,7 +46,7 @@ export default function ProjectDetailPage() {
   }
 
   const whatsappMsg = `Hello Solaris Team, I saw your project: ${project.title} (${project.capacity} in ${project.location}). I have a similar requirement for my property.`;
-  const whatsappUrl = `https://wa.me/919876543210?text=${encodeURIComponent(whatsappMsg)}`;
+  const whatsappUrl = `https://wa.me/917849067305?text=${encodeURIComponent(whatsappMsg)}`;
 
   return (
     <div className="space-y-16 py-12">

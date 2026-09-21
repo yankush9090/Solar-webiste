@@ -44,7 +44,7 @@ export default function ProductDetailPage() {
   }
 
   const whatsappMsg = `Hello Solaris Team, I am interested in purchasing/inquiring about the product: ${product.name} (${product.brand} - ${product.model || ''}). Please share available stock and price.`;
-  const whatsappUrl = `https://wa.me/919876543210?text=${encodeURIComponent(whatsappMsg)}`;
+  const whatsappUrl = `https://wa.me/917849067305?text=${encodeURIComponent(whatsappMsg)}`;
 
   return (
     <div className="space-y-16 py-12">

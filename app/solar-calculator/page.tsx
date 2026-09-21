@@ -1,13 +1,17 @@
 import React from 'react';
 import SolarCalculator from '@/components/calculator/SolarCalculator';
 import { Zap, ShieldCheck, HelpCircle, CheckCircle2, TrendingUp } from 'lucide-react';
+import { getCalculatorSettingsAction, getSettingsAction } from '@/lib/db/actions';
+import { INITIAL_CALCULATOR_SETTINGS, INITIAL_SITE_SETTINGS } from '@/lib/data/initial-data';
 
-export const metadata = {
-  title: 'Solar Rooftop Calculator & PM Surya Ghar Subsidy Estimator | Solaris',
-  description: 'Calculate your solar capacity, monthly power bill savings, payback period, and central subsidy of up to ₹78,000 under PM Surya Ghar Muft Bijli Yojana.',
-};
+export const dynamic = 'force-dynamic';
 
-export default function SolarCalculatorPage() {
+export default async function SolarCalculatorPage() {
+  const [calcSettings, siteSettings] = await Promise.all([
+    getCalculatorSettingsAction().catch(() => INITIAL_CALCULATOR_SETTINGS),
+    getSettingsAction().catch(() => INITIAL_SITE_SETTINGS)
+  ]);
+
   return (
     <div className="space-y-16 py-12">
       {/* Header */}
@@ -27,7 +31,7 @@ export default function SolarCalculatorPage() {
 
       {/* Main Interactive Calculator Component */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SolarCalculator />
+        <SolarCalculator initialSettings={calcSettings} whatsappNumber={siteSettings.whatsapp_number} />
       </section>
 
       {/* Subsidy Slabs Guide Table */}

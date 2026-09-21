@@ -146,7 +146,7 @@ export default function BlogPostDetailPage() {
               Calculate My Savings
             </Link>
             <a
-              href="https://wa.me/919876543210?text=Hello%2C%20I%20read%20your%20solar%20guide%20and%20have%20a%20question."
+              href="https://wa.me/917849067305?text=Hello%2C%20I%20read%20your%20solar%20guide%20and%20have%20a%20question."
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-3 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all flex items-center"

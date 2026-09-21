@@ -46,7 +46,7 @@ export default function SolutionDetailPage() {
   }
 
   const whatsappMsg = `Hello Solaris Team, I would like to inquire about ${solution.title} for my property. Please share full technical specifications and cost estimate.`;
-  const whatsappUrl = `https://wa.me/919876543210?text=${encodeURIComponent(whatsappMsg)}`;
+  const whatsappUrl = `https://wa.me/917849067305?text=${encodeURIComponent(whatsappMsg)}`;
 
   return (
     <div className="space-y-16 py-12">

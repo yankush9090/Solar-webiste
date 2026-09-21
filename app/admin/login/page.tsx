@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Sun, Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
-import { loginAdminAction } from '@/lib/db/actions';
+import { Sun, Lock, Mail, ShieldCheck } from 'lucide-react';
+import { SolarService } from '@/lib/services/solar-service';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
     setErrorMsg('');
 
     try {
-      const res = await loginAdminAction(email, password);
+      const res = await SolarService.loginAdmin(email, password);
       if (!res.success) {
         setErrorMsg(res.error || 'Invalid credentials.');
         setLoading(false);

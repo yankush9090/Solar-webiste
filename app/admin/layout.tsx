@@ -86,8 +86,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Mobile Header Bar */}
       <div className="md:hidden bg-slate-950 text-white p-4 flex items-center justify-between sticky top-0 z-30">
         <Link href="/admin" className="flex items-center space-x-2">
-          <Sun className="w-5 h-5 text-amber-400" />
-          <span className="font-black text-sm tracking-tight">SOLARIS ADMIN</span>
+          <div className="bg-white px-2 py-0.5 rounded-lg flex items-center">
+            <img src="/images/logo.png" alt="Maati Energy" className="h-6 w-auto object-contain" />
+          </div>
+          <span className="font-black text-sm tracking-tight">ADMIN PANEL</span>
         </Link>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -107,13 +109,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       >
         <div className="space-y-6 overflow-y-auto">
           {/* Brand */}
-          <div className="flex items-center space-x-2.5 px-2 pt-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-solar-500 to-amber-400 flex items-center justify-center text-white shadow">
-              <Sun className="w-5 h-5" />
+          <div className="px-2 pt-2">
+            <div className="bg-white p-2 rounded-2xl flex items-center justify-center shadow-md mb-2">
+              <img
+                src="/images/logo.png"
+                alt="Maati Energy"
+                className="h-9 w-auto object-contain"
+              />
             </div>
-            <div>
-              <p className="font-black text-white text-base tracking-tight leading-none">SOLARIS</p>
-              <p className="text-[10px] text-solar-400 font-semibold tracking-wider uppercase mt-1">
+            <div className="px-1">
+              <p className="text-[10px] text-solar-400 font-bold tracking-widest uppercase">
                 CMS Admin Panel
               </p>
             </div>

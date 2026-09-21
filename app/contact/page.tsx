@@ -268,15 +268,15 @@ export default function ContactPage() {
 
                 <div className="flex items-center space-x-3 text-slate-300">
                   <Phone className="w-5 h-5 text-solar-400 shrink-0" />
-                  <a href="tel:+919121086779" className="hover:text-white transition-colors">
-                    +91 98765 43210
+                  <a href="tel:+917849067305" className="hover:text-white transition-colors">
+                    +91 78490 67305
                   </a>
                 </div>
 
                 <div className="flex items-center space-x-3 text-slate-300">
                   <Mail className="w-5 h-5 text-solar-400 shrink-0" />
-                  <a href="mailto:hello@solarisenergy.com" className="hover:text-white transition-colors">
-                    hello@solarisenergy.com
+                  <a href="mailto:info@maatienergy.com" className="hover:text-white transition-colors">
+                    info@maatienergy.com
                   </a>
                 </div>
 
@@ -289,7 +289,7 @@ export default function ContactPage() {
               <div className="pt-4 border-t border-slate-800 space-y-2.5">
                 <p className="text-xs font-semibold text-slate-400">Need immediate answers?</p>
                 <a
-                  href="https://wa.me/919876543210?text=Hello%2C%20I%20would%20like%20to%20enquire%20about%20solar%20solutions."
+                  href="https://wa.me/917849067305?text=Hello%2C%20I%20would%20like%20to%20enquire%20about%20solar%20solutions."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center transition-colors shadow"

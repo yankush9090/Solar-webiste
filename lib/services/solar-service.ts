@@ -110,5 +110,13 @@ export const SolarService = {
     await actions.deleteEnquiryAction(id);
     return actions.getEnquiriesAction();
   },
+
+  // Media
+  getMediaItems: actions.getMediaItemsAction,
+  saveMediaItem: actions.saveMediaItemAction,
+  deleteMediaItem: actions.deleteMediaItemAction,
+
+  // Admin Auth
+  loginAdmin: actions.loginAdminAction,
 };
 

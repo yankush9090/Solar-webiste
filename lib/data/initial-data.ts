@@ -18,11 +18,13 @@ import {
 } from '../types';
 
 export const INITIAL_SITE_SETTINGS: SiteSettings = {
-  company_name: 'Solaris Energy Solutions',
-  tagline: 'Leading Solar Engineering, Procurement & Commissioning (EPC) Company',
-  phone_number: '+91 98765 43210',
-  whatsapp_number: '+919121086779',
-  email: 'hello@solarisenergy.com',
+  company_name: 'Maati Energy',
+  tagline: 'Sustainable. Smart. Indian.',
+  logo_url: '/images/logo.png',
+  favicon_url: '/favicon.ico',
+  phone_number: '+91 78490 67305',
+  whatsapp_number: '+917849067305',
+  email: 'info@maatienergy.com',
   address: 'Plot 42, EcoTech Renewable Corridor, Outer Ring Road, Bengaluru, Karnataka 560103',
   working_hours: 'Monday – Saturday: 9:00 AM – 7:00 PM',
   google_maps_url: 'https://maps.google.com',

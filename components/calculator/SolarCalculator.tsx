@@ -26,7 +26,7 @@ interface SolarCalculatorProps {
 
 export default function SolarCalculator({
   initialSettings = INITIAL_CALCULATOR_SETTINGS,
-  whatsappNumber = '+919121086779'
+  whatsappNumber = '+917849067305'
 }: SolarCalculatorProps) {
   // Input states
   const [bill, setBill] = useState<number>(4500);
