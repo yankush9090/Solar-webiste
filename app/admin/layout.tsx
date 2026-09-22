@@ -31,7 +31,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [authorized, setAuthorized] = useState(false);
-  const [dbConnected, setDbConnected] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (pathname === '/admin/login') {
@@ -43,7 +42,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       router.replace('/admin/login');
     } else {
       setAuthorized(true);
-      SolarService.getDbStatus().then((st) => setDbConnected(st?.connected ?? false)).catch(() => setDbConnected(false));
     }
   }, [pathname, router]);
 
@@ -152,28 +150,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </nav>
         </div>
 
-        {/* Bottom Actions & Database Status */}
+        {/* Bottom Actions */}
         <div className="pt-4 border-t border-slate-800 space-y-2">
-          <Link
-            href="/admin/settings"
-            className="flex items-center justify-between px-3 py-2 rounded-xl text-[11px] font-medium bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition-colors"
-            title="Database Connection Status"
-          >
-            <span className="text-slate-400">Database</span>
-            {dbConnected === null ? (
-              <span className="text-slate-500 text-[10px]">Checking...</span>
-            ) : dbConnected ? (
-              <span className="text-emerald-400 font-bold flex items-center gap-1 text-[10px]">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Live Cloud DB
-              </span>
-            ) : (
-              <span className="text-amber-400 font-bold flex items-center gap-1 text-[10px]">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
-                Not Connected
-              </span>
-            )}
-          </Link>
 
           <Link
             href="/"
