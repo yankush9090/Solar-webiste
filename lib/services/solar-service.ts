@@ -17,6 +17,7 @@ export const SolarService = {
   saveSettings: actions.saveSettingsAction,
   updateSettings: actions.saveSettingsAction,
   getStats: actions.getStatsAction,
+  getDbStatus: actions.getDbStatusAction,
 
   // Solutions
   getSolutions: actions.getSolutionsAction,

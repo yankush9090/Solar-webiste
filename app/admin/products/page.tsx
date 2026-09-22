@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Plus, Trash2, Edit3, CheckCircle2 } from 'lucide-react';
+import { ShoppingBag, Plus, Trash2, Edit3, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { SolarService } from '@/lib/services/solar-service';
 import { Product } from '@/lib/types';
 import { INITIAL_PRODUCTS } from '@/lib/data/initial-data';
@@ -10,6 +10,8 @@ export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     SolarService.getProducts().then(setProducts);
@@ -18,10 +20,18 @@ export default function AdminProductsPage() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingProduct) return;
-    const updated = await SolarService.saveProduct(editingProduct);
-    setProducts(updated);
-    setShowModal(false);
-    setEditingProduct(null);
+    setSaving(true);
+    setError(null);
+    try {
+      const updated = await SolarService.saveProduct(editingProduct);
+      setProducts(updated);
+      setShowModal(false);
+      setEditingProduct(null);
+    } catch (err: any) {
+      setError(err.message || 'Failed to save product to database.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleAddNew = () => {
@@ -119,6 +129,12 @@ export default function AdminProductsPage() {
             <h3 className="text-lg font-black text-slate-900">
               {editingProduct.id.startsWith('prod-') ? 'Edit Product' : 'Add New Hardware'}
             </h3>
+            {error && (
+              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold rounded-xl flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                <span>{error}</span>
+              </div>
+            )}
             <form onSubmit={handleSave} className="space-y-3 text-xs">
               <div>
                 <label className="font-bold text-slate-700 block mb-1">Product Name</label>
@@ -208,16 +224,19 @@ export default function AdminProductsPage() {
               <div className="pt-3 flex justify-end gap-2 border-t">
                 <button
                   type="button"
+                  disabled={saving}
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 bg-slate-100 rounded-xl font-semibold"
+                  className="px-4 py-2 bg-slate-100 rounded-xl font-semibold disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-solar-600 text-white rounded-xl font-bold"
+                  disabled={saving}
+                  className="px-4 py-2 bg-solar-600 text-white rounded-xl font-bold flex items-center gap-1.5 disabled:opacity-50"
                 >
-                  Save Product
+                  {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{saving ? 'Saving...' : 'Save Product'}</span>
                 </button>
               </div>
             </form>

@@ -1,7 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { query, isPostgresConfigured } from './pool';
+import { query, isPostgresConfigured, testConnection } from './pool';
+
+export async function getDbStatusAction() {
+  return await testConnection();
+}
 
 function purgeCache() {
   try {
@@ -50,9 +54,13 @@ import {
 // SITE SETTINGS
 export async function getSettingsAction(): Promise<SiteSettings> {
   if (isPostgresConfigured()) {
-    const res = await query('SELECT * FROM site_settings WHERE id = 1 LIMIT 1');
-    if (res && res.rows.length > 0) {
-      return res.rows[0] as SiteSettings;
+    try {
+      const res = await query('SELECT * FROM site_settings WHERE id = 1 LIMIT 1');
+      if (res && res.rows.length > 0) {
+        return res.rows[0] as SiteSettings;
+      }
+    } catch (err) {
+      console.error('getSettingsAction database query notice:', err);
     }
   }
   return INITIAL_SITE_SETTINGS;
@@ -60,45 +68,52 @@ export async function getSettingsAction(): Promise<SiteSettings> {
 
 export async function saveSettingsAction(settings: Partial<SiteSettings>): Promise<SiteSettings> {
   if (isPostgresConfigured()) {
-    await query(
-      `INSERT INTO site_settings (
-        id, company_name, tagline, logo_url, favicon_url, google_maps_url,
-        phone_number, whatsapp_number, email, address, working_hours,
-        facebook_url, instagram_url, linkedin_url, youtube_url, updated_at
-      ) VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW())
-      ON CONFLICT (id) DO UPDATE SET
-        company_name = EXCLUDED.company_name,
-        tagline = EXCLUDED.tagline,
-        logo_url = EXCLUDED.logo_url,
-        favicon_url = EXCLUDED.favicon_url,
-        google_maps_url = EXCLUDED.google_maps_url,
-        phone_number = EXCLUDED.phone_number,
-        whatsapp_number = EXCLUDED.whatsapp_number,
-        email = EXCLUDED.email,
-        address = EXCLUDED.address,
-        working_hours = EXCLUDED.working_hours,
-        facebook_url = EXCLUDED.facebook_url,
-        instagram_url = EXCLUDED.instagram_url,
-        linkedin_url = EXCLUDED.linkedin_url,
-        youtube_url = EXCLUDED.youtube_url,
-        updated_at = NOW()`,
-      [
-        settings.company_name,
-        settings.tagline,
-        settings.logo_url || '/images/logo.png',
-        settings.favicon_url || '/favicon.ico',
-        settings.google_maps_url || 'https://maps.google.com',
-        settings.phone_number,
-        settings.whatsapp_number,
-        settings.email,
-        settings.address,
-        settings.working_hours,
-        settings.facebook_url,
-        settings.instagram_url,
-        settings.linkedin_url,
-        settings.youtube_url,
-      ]
-    );
+    try {
+      await query(
+        `INSERT INTO site_settings (
+          id, company_name, tagline, logo_url, favicon_url, google_maps_url,
+          phone_number, whatsapp_number, email, address, working_hours,
+          facebook_url, instagram_url, linkedin_url, youtube_url, updated_at
+        ) VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW())
+        ON CONFLICT (id) DO UPDATE SET
+          company_name = EXCLUDED.company_name,
+          tagline = EXCLUDED.tagline,
+          logo_url = EXCLUDED.logo_url,
+          favicon_url = EXCLUDED.favicon_url,
+          google_maps_url = EXCLUDED.google_maps_url,
+          phone_number = EXCLUDED.phone_number,
+          whatsapp_number = EXCLUDED.whatsapp_number,
+          email = EXCLUDED.email,
+          address = EXCLUDED.address,
+          working_hours = EXCLUDED.working_hours,
+          facebook_url = EXCLUDED.facebook_url,
+          instagram_url = EXCLUDED.instagram_url,
+          linkedin_url = EXCLUDED.linkedin_url,
+          youtube_url = EXCLUDED.youtube_url,
+          updated_at = NOW()`,
+        [
+          settings.company_name,
+          settings.tagline,
+          settings.logo_url || '/images/logo.png',
+          settings.favicon_url || '/favicon.ico',
+          settings.google_maps_url || 'https://maps.google.com',
+          settings.phone_number,
+          settings.whatsapp_number,
+          settings.email,
+          settings.address,
+          settings.working_hours,
+          settings.facebook_url,
+          settings.instagram_url,
+          settings.linkedin_url,
+          settings.youtube_url,
+        ]
+      );
+    } catch (err: any) {
+      console.error('Error in saveSettingsAction:', err);
+      throw new Error(`Database Write Failed: ${err.message || 'Connection error'}. Please check DATABASE_URL in Vercel settings.`);
+    }
+  } else {
+    throw new Error('Database Not Configured: DATABASE_URL environment variable is missing on this deployment. Changes cannot be saved until DATABASE_URL is added to Vercel Environment Variables.');
   }
   purgeCache();
   return { ...INITIAL_SITE_SETTINGS, ...settings, updated_at: new Date().toISOString() };
@@ -127,7 +142,10 @@ export async function getSolutionsAction(): Promise<Solution[]> {
 }
 
 export async function saveSolutionAction(solution: Solution): Promise<void> {
-  if (isPostgresConfigured()) {
+  if (!isPostgresConfigured()) {
+    throw new Error('Database Not Configured: DATABASE_URL environment variable is missing on Vercel.');
+  }
+  try {
     await query(
       `INSERT INTO solutions (
         id, title, slug, short_description, full_description, hero_image, icon,
@@ -158,6 +176,9 @@ export async function saveSolutionAction(solution: Solution): Promise<void> {
         solution.active ?? true,
       ]
     );
+  } catch (err: any) {
+    console.error('Error in saveSolutionAction:', err);
+    throw new Error(`Failed to save solution: ${err.message || err}`);
   }
   purgeCache();
 }
@@ -184,7 +205,10 @@ export async function getProductCategoriesAction(): Promise<ProductCategory[]> {
 }
 
 export async function saveProductAction(product: Product): Promise<void> {
-  if (isPostgresConfigured()) {
+  if (!isPostgresConfigured()) {
+    throw new Error('Database Not Configured: DATABASE_URL environment variable is missing on Vercel.');
+  }
+  try {
     await query(
       `INSERT INTO products (
         id, category_id, name, slug, brand, model, capacity,
@@ -223,6 +247,9 @@ export async function saveProductAction(product: Product): Promise<void> {
         product.display_order || 0,
       ]
     );
+  } catch (err: any) {
+    console.error('Error in saveProductAction:', err);
+    throw new Error(`Failed to save product: ${err.message || err}`);
   }
   purgeCache();
 }
@@ -239,7 +266,10 @@ export async function getPackagesAction(): Promise<Package[]> {
 }
 
 export async function savePackageAction(pkg: Package): Promise<void> {
-  if (isPostgresConfigured()) {
+  if (!isPostgresConfigured()) {
+    throw new Error('Database Not Configured: DATABASE_URL environment variable is missing on Vercel.');
+  }
+  try {
     await query(
       `INSERT INTO packages (
         id, name, slug, capacity, system_type, price, discount_price,
@@ -276,6 +306,9 @@ export async function savePackageAction(pkg: Package): Promise<void> {
         pkg.active ?? true,
       ]
     );
+  } catch (err: any) {
+    console.error('Error in savePackageAction:', err);
+    throw new Error(`Failed to save package: ${err.message || err}`);
   }
   purgeCache();
 }
@@ -292,7 +325,10 @@ export async function getProjectsAction(): Promise<Project[]> {
 }
 
 export async function saveProjectAction(project: Project): Promise<void> {
-  if (isPostgresConfigured()) {
+  if (!isPostgresConfigured()) {
+    throw new Error('Database Not Configured: DATABASE_URL environment variable is missing on Vercel.');
+  }
+  try {
     await query(
       `INSERT INTO projects (
         id, title, slug, category, location, capacity, system_type,
@@ -327,6 +363,9 @@ export async function saveProjectAction(project: Project): Promise<void> {
         project.display_order || 0,
       ]
     );
+  } catch (err: any) {
+    console.error('Error in saveProjectAction:', err);
+    throw new Error(`Failed to save project: ${err.message || err}`);
   }
   purgeCache();
 }
@@ -343,7 +382,10 @@ export async function getTestimonialsAction(): Promise<Testimonial[]> {
 }
 
 export async function saveTestimonialAction(t: Testimonial): Promise<void> {
-  if (isPostgresConfigured()) {
+  if (!isPostgresConfigured()) {
+    throw new Error('Database Not Configured: DATABASE_URL environment variable is missing on Vercel.');
+  }
+  try {
     await query(
       `INSERT INTO testimonials (id, customer_name, location, photo_url, review, rating, project_info, display_order, active)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
@@ -354,6 +396,9 @@ export async function saveTestimonialAction(t: Testimonial): Promise<void> {
          project_info = EXCLUDED.project_info`,
       [t.id, t.customer_name, t.location, t.photo_url || null, t.review, t.rating || 5, t.project_info || null, t.display_order || 0, t.active ?? true]
     );
+  } catch (err: any) {
+    console.error('Error in saveTestimonialAction:', err);
+    throw new Error(`Failed to save testimonial: ${err.message || err}`);
   }
   purgeCache();
 }
@@ -369,7 +414,10 @@ export async function getFaqsAction(): Promise<FAQ[]> {
 }
 
 export async function saveFaqAction(f: FAQ): Promise<void> {
-  if (isPostgresConfigured()) {
+  if (!isPostgresConfigured()) {
+    throw new Error('Database Not Configured: DATABASE_URL environment variable is missing on Vercel.');
+  }
+  try {
     await query(
       `INSERT INTO faqs (id, question, answer, category, display_order, active)
        VALUES ($1, $2, $3, $4, $5, $6)
@@ -379,6 +427,9 @@ export async function saveFaqAction(f: FAQ): Promise<void> {
          category = EXCLUDED.category`,
       [f.id, f.question, f.answer, f.category, f.display_order || 0, f.active ?? true]
     );
+  } catch (err: any) {
+    console.error('Error in saveFaqAction:', err);
+    throw new Error(`Failed to save FAQ: ${err.message || err}`);
   }
   purgeCache();
 }
@@ -395,7 +446,10 @@ export async function getBlogPostsAction(): Promise<BlogPost[]> {
 }
 
 export async function saveBlogPostAction(b: BlogPost): Promise<void> {
-  if (isPostgresConfigured()) {
+  if (!isPostgresConfigured()) {
+    throw new Error('Database Not Configured: DATABASE_URL environment variable is missing on Vercel.');
+  }
+  try {
     await query(
       `INSERT INTO blog_posts (
         id, title, slug, excerpt, content, featured_image, author,
@@ -425,6 +479,9 @@ export async function saveBlogPostAction(b: BlogPost): Promise<void> {
         b.status || 'PUBLISHED',
       ]
     );
+  } catch (err: any) {
+    console.error('Error in saveBlogPostAction:', err);
+    throw new Error(`Failed to save blog post: ${err.message || err}`);
   }
   purgeCache();
 }
@@ -441,7 +498,10 @@ export async function getSubsidyAction(): Promise<SubsidyScheme> {
 }
 
 export async function saveSubsidyAction(s: Partial<SubsidyScheme>): Promise<SubsidyScheme> {
-  if (isPostgresConfigured()) {
+  if (!isPostgresConfigured()) {
+    throw new Error('Database Not Configured: DATABASE_URL environment variable is missing on Vercel.');
+  }
+  try {
     await query(
       `INSERT INTO subsidy_schemes (id, name, slug, overview, notes, portal_url, last_updated, active)
        VALUES ('sub-pmsuryaghar', $1, 'pm-surya-ghar', $2, $3, $4, CURRENT_DATE, true)
@@ -453,6 +513,9 @@ export async function saveSubsidyAction(s: Partial<SubsidyScheme>): Promise<Subs
         last_updated = CURRENT_DATE`,
       [s.name, s.overview, s.notes, s.portal_url]
     );
+  } catch (err: any) {
+    console.error('Error in saveSubsidyAction:', err);
+    throw new Error(`Failed to save subsidy: ${err.message || err}`);
   }
   purgeCache();
   return { ...INITIAL_SUBSIDY, ...s, last_updated: new Date().toISOString().split('T')[0] };
@@ -480,7 +543,10 @@ export async function getCalculatorSettingsAction(): Promise<CalculatorSettings>
 }
 
 export async function saveCalculatorSettingsAction(c: Partial<CalculatorSettings>): Promise<CalculatorSettings> {
-  if (isPostgresConfigured()) {
+  if (!isPostgresConfigured()) {
+    throw new Error('Database Not Configured: DATABASE_URL environment variable is missing on Vercel.');
+  }
+  try {
     await query(
       `INSERT INTO calculator_settings (id, cost_per_kw, generation_per_kw_per_month, default_tariff, co2_factor, maintenance_percent, updated_at)
        VALUES (1, $1, $2, $3, $4, $5, NOW())
@@ -492,6 +558,9 @@ export async function saveCalculatorSettingsAction(c: Partial<CalculatorSettings
          updated_at = NOW()`,
       [c.cost_per_kw, c.generation_per_kw_per_month, c.default_tariff, c.co2_factor, c.maintenance_percent || 1.5]
     );
+  } catch (err: any) {
+    console.error('Error in saveCalculatorSettingsAction:', err);
+    throw new Error(`Failed to save calculator settings: ${err.message || err}`);
   }
   purgeCache();
   return { ...INITIAL_CALCULATOR_SETTINGS, ...c };

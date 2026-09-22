@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Layers, Plus, Edit3 } from 'lucide-react';
+import { Layers, Plus, Edit3, AlertCircle, Loader2 } from 'lucide-react';
 import { SolarService } from '@/lib/services/solar-service';
 import { Solution } from '@/lib/types';
 import { INITIAL_SOLUTIONS } from '@/lib/data/initial-data';
@@ -10,6 +10,8 @@ export default function AdminSolutionsPage() {
   const [solutions, setSolutions] = useState<Solution[]>(INITIAL_SOLUTIONS);
   const [editing, setEditing] = useState<Solution | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     SolarService.getSolutions().then(setSolutions);
@@ -18,10 +20,18 @@ export default function AdminSolutionsPage() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editing) return;
-    const updated = await SolarService.saveSolution(editing);
-    setSolutions(updated);
-    setModalOpen(false);
-    setEditing(null);
+    setSaving(true);
+    setError(null);
+    try {
+      const updated = await SolarService.saveSolution(editing);
+      setSolutions(updated);
+      setModalOpen(false);
+      setEditing(null);
+    } catch (err: any) {
+      setError(err.message || 'Failed to save solution to database.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -83,6 +93,12 @@ export default function AdminSolutionsPage() {
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-200">
             <h3 className="text-lg font-black text-slate-900">Edit Solution</h3>
+            {error && (
+              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold rounded-xl flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                <span>{error}</span>
+              </div>
+            )}
             <form onSubmit={handleSave} className="space-y-3 text-xs">
               <div>
                 <label className="font-bold text-slate-700 block mb-1">Title</label>
@@ -129,16 +145,19 @@ export default function AdminSolutionsPage() {
               <div className="pt-3 flex justify-end gap-2 border-t">
                 <button
                   type="button"
+                  disabled={saving}
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 rounded-xl font-semibold"
+                  className="px-4 py-2 bg-slate-100 rounded-xl font-semibold disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-solar-600 text-white rounded-xl font-bold"
+                  disabled={saving}
+                  className="px-4 py-2 bg-solar-600 text-white rounded-xl font-bold flex items-center gap-1.5 disabled:opacity-50"
                 >
-                  Save Solution
+                  {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{saving ? 'Saving...' : 'Save Solution'}</span>
                 </button>
               </div>
             </form>
