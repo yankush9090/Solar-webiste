@@ -38,6 +38,9 @@ export default function AdminSettingsPage() {
           logo_url: data.logo_url || '',
         });
       }
+    }).catch((err) => {
+      console.error('Failed loading website settings:', err);
+      setSaveError(err.message || 'Website settings could not be loaded. Check the database connection.');
     });
   }, []);
 
@@ -92,7 +95,11 @@ export default function AdminSettingsPage() {
     setSaveError('');
 
     try {
-      await SolarService.updateSettings(settings);
+      const result = await SolarService.updateSettings(settings);
+      if (!result.success) {
+        setSaveError(result.error);
+        return;
+      }
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 5000);
     } catch (err: any) {

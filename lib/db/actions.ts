@@ -247,6 +247,9 @@ export async function getSettingsAction(): Promise<SiteSettings> {
           instagram_url: dbSettings.instagram_url || '',
           linkedin_url: dbSettings.linkedin_url || '',
           youtube_url: dbSettings.youtube_url || '',
+          updated_at: dbSettings.updated_at
+            ? new Date(dbSettings.updated_at).toISOString()
+            : undefined,
         };
         global._siteSettingsStore = normalizedSettings;
         return normalizedSettings;
@@ -258,12 +261,13 @@ export async function getSettingsAction(): Promise<SiteSettings> {
   return getLocalSettings();
 }
 
-export async function saveSettingsAction(settings: Partial<SiteSettings>): Promise<SiteSettings> {
-  requirePersistentStorage();
-  const updated = setLocalSettings(settings);
-  if (isPostgresConfigured()) {
-    try {
-      await query(
+export async function saveSettingsAction(
+  settings: Partial<SiteSettings>
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    requirePersistentStorage();
+    const updated = setLocalSettings(settings);
+    await query(
         `INSERT INTO site_settings (
           id, company_name, tagline, logo_url, favicon_url, google_maps_url,
           phone_number, whatsapp_number, email, address, working_hours,
@@ -301,13 +305,13 @@ export async function saveSettingsAction(settings: Partial<SiteSettings>): Promi
           updated.linkedin_url || null,
           updated.youtube_url || null,
         ]
-      );
-    } catch (err: any) {
-      throw new Error(`Could not save settings to PostgreSQL: ${err.message || err}`);
-    }
+    );
+    purgeCache();
+    return { success: true };
+  } catch (err: any) {
+    console.error('Could not save settings to PostgreSQL:', err);
+    return { success: false, error: err.message || 'Could not save website settings.' };
   }
-  purgeCache();
-  return updated;
 }
 
 // STATS
