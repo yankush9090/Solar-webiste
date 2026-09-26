@@ -11,6 +11,7 @@ export default function AdminProductsPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
     SolarService.getProducts().then(setProducts);
@@ -20,28 +21,22 @@ export default function AdminProductsPage() {
     e.preventDefault();
     if (!editingProduct) return;
     setSaving(true);
+    setSaveError('');
     try {
       const updated = await SolarService.saveProduct(editingProduct);
       setProducts(updated);
-    } catch (err: any) {
-      console.warn('Database product save warning, updating locally:', err);
-      setProducts((prev) => {
-        const idx = prev.findIndex((p) => p.id === editingProduct.id);
-        if (idx >= 0) {
-          const next = [...prev];
-          next[idx] = editingProduct;
-          return next;
-        }
-        return [editingProduct, ...prev];
-      });
-    } finally {
-      setSaving(false);
       setShowModal(false);
       setEditingProduct(null);
+    } catch (err: any) {
+      console.error('Database product save failed:', err);
+      setSaveError(err.message || 'Product could not be saved. Check the database connection and required fields.');
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleAddNew = () => {
+    setSaveError('');
     setEditingProduct({
       id: `prod-${Date.now()}`,
       name: '',
@@ -116,6 +111,7 @@ export default function AdminProductsPage() {
                 <td className="py-3 px-4 text-right">
                   <button
                     onClick={() => {
+                      setSaveError('');
                       setEditingProduct(p);
                       setShowModal(true);
                     }}
@@ -134,8 +130,14 @@ export default function AdminProductsPage() {
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl max-w-xl w-full p-6 space-y-4 shadow-2xl border border-slate-200">
             <h3 className="text-lg font-black text-slate-900">
-              {editingProduct.id.startsWith('prod-') ? 'Edit Product' : 'Add New Hardware'}
+              {products.some((product) => product.id === editingProduct.id) ? 'Edit Product' : 'Add New Hardware'}
             </h3>
+            {saveError && (
+              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold rounded-xl flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>{saveError}</span>
+              </div>
+            )}
             <form onSubmit={handleSave} className="space-y-3 text-xs">
               <div>
                 <label className="font-bold text-slate-700 block mb-1">Product Name</label>

@@ -256,6 +256,7 @@ export async function getSettingsAction(): Promise<SiteSettings> {
       }
     } catch (err) {
       console.warn('getSettingsAction database query notice:', err);
+      if (process.env.VERCEL) throw err;
     }
   }
   return getLocalSettings();

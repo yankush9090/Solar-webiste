@@ -24,7 +24,9 @@ export default function AppShell({ children }: AppShellProps) {
 
   useEffect(() => {
     if (!isAdmin) {
-      getSettingsAction().then(setSettings);
+      getSettingsAction().then(setSettings).catch((err) => {
+        console.error('Could not load site settings:', err);
+      });
     }
   }, [isAdmin]);
 

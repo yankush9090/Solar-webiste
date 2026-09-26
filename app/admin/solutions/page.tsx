@@ -11,6 +11,7 @@ export default function AdminSolutionsPage() {
   const [editing, setEditing] = useState<Solution | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
     SolarService.getSolutions().then(setSolutions);
@@ -20,16 +21,17 @@ export default function AdminSolutionsPage() {
     e.preventDefault();
     if (!editing) return;
     setSaving(true);
+    setSaveError('');
     try {
       const updated = await SolarService.saveSolution(editing);
       setSolutions(updated);
-    } catch (err: any) {
-      console.warn('Database save warning, updating locally:', err);
-      setSolutions((prev) => prev.map((s) => (s.id === editing.id ? editing : s)));
-    } finally {
-      setSaving(false);
       setModalOpen(false);
       setEditing(null);
+    } catch (err: any) {
+      console.error('Database solution save failed:', err);
+      setSaveError(err.message || 'Solution could not be saved. Check the database connection and required fields.');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -74,6 +76,7 @@ export default function AdminSolutionsPage() {
                 <td className="py-3 px-4 text-right">
                   <button
                     onClick={() => {
+                      setSaveError('');
                       setEditing(sol);
                       setModalOpen(true);
                     }}
@@ -92,6 +95,12 @@ export default function AdminSolutionsPage() {
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-200">
             <h3 className="text-lg font-black text-slate-900">Edit Solution</h3>
+            {saveError && (
+              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold rounded-xl flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>{saveError}</span>
+              </div>
+            )}
             <form onSubmit={handleSave} className="space-y-3 text-xs">
               <div>
                 <label className="font-bold text-slate-700 block mb-1">Title</label>

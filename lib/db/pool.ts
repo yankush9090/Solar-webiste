@@ -10,6 +10,22 @@ export const isPostgresConfigured = (): boolean => {
   return !!(dbUrl && dbUrl.trim().length > 0);
 };
 
+function getHostedDatabaseConfigurationError(): string | null {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!process.env.VERCEL || !dbUrl) return null;
+
+  try {
+    const hostname = new URL(dbUrl).hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1') {
+      return 'Vercel cannot connect to a database running on localhost. Set DATABASE_URL in Vercel to a hosted PostgreSQL connection string (for example, from Neon or Supabase), then redeploy.';
+    }
+  } catch {
+    return 'DATABASE_URL is not a valid PostgreSQL connection URL. Update it in Vercel and redeploy.';
+  }
+
+  return null;
+}
+
 export function getPool(): Pool | null {
   const dbUrl = process.env.DATABASE_URL;
   if (!dbUrl || dbUrl.trim().length === 0) {
@@ -46,6 +62,9 @@ export async function query<R extends QueryResultRow = any>(
   text: string,
   params?: any[]
 ): Promise<QueryResult<R> | null> {
+  const configurationError = getHostedDatabaseConfigurationError();
+  if (configurationError) throw new Error(configurationError);
+
   const poolInstance = getPool();
   if (!poolInstance) {
     console.warn('PostgreSQL query skipped: DATABASE_URL is not defined in environment variables.');
@@ -65,6 +84,16 @@ export async function testConnection(): Promise<{
   host: string;
   error?: string;
 }> {
+  const configurationError = getHostedDatabaseConfigurationError();
+  if (configurationError) {
+    return {
+      configured: true,
+      connected: false,
+      host: 'localhost (unreachable from Vercel)',
+      error: configurationError,
+    };
+  }
+
   const dbUrl = process.env.DATABASE_URL;
   if (!dbUrl || dbUrl.trim().length === 0) {
     return {
