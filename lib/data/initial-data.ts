@@ -18,20 +18,20 @@ import {
 } from '../types';
 
 export const INITIAL_SITE_SETTINGS: SiteSettings = {
-  company_name: 'Maati Energy',
-  tagline: 'Sustainable. Smart. Indian.',
-  logo_url: '/images/logo.png',
-  favicon_url: '/favicon.ico',
-  phone_number: '+91 78490 67305',
-  whatsapp_number: '+917849067305',
-  email: 'info@maatienergy.com',
-  address: 'Plot 42, EcoTech Renewable Corridor, Outer Ring Road, Bengaluru, Karnataka 560103',
-  working_hours: 'Monday – Saturday: 9:00 AM – 7:00 PM',
-  google_maps_url: 'https://maps.google.com',
-  facebook_url: 'https://facebook.com',
-  instagram_url: 'https://instagram.com',
-  linkedin_url: 'https://linkedin.com',
-  youtube_url: 'https://youtube.com',
+  company_name: '',
+  tagline: '',
+  logo_url: '',
+  favicon_url: '',
+  phone_number: '',
+  whatsapp_number: '',
+  email: '',
+  address: '',
+  working_hours: '',
+  google_maps_url: '',
+  facebook_url: '',
+  instagram_url: '',
+  linkedin_url: '',
+  youtube_url: '',
 };
 
 export const INITIAL_STATS: HomepageStat[] = [

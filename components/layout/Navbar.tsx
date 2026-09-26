@@ -51,7 +51,10 @@ export default function Navbar({ settings = INITIAL_SITE_SETTINGS, onOpenSearch 
     { name: 'FAQ', href: '/faq' },
   ];
 
-  const whatsappHref = `https://wa.me/${settings.whatsapp_number?.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello ${settings.company_name || 'Maati Energy'} team, I would like to inquire about solar rooftop solutions.`)}`;
+  const whatsappNumber = settings.whatsapp_number.replace(/[^0-9]/g, '');
+  const whatsappHref = whatsappNumber
+    ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hello, I would like to inquire about solar rooftop solutions.')}`
+    : '';
 
   return (
     <>
@@ -62,15 +65,13 @@ export default function Navbar({ settings = INITIAL_SITE_SETTINGS, onOpenSearch 
             <span className="flex items-center text-amber-400 font-medium">
               <Zap className="w-3.5 h-3.5 mr-1" /> PM Surya Ghar Empanelled Vendor
             </span>
-            <span className="text-slate-400">
-              Working Hours: {settings.working_hours}
-            </span>
+            {settings.working_hours && <span className="text-slate-400">Working Hours: {settings.working_hours}</span>}
           </div>
           <div className="flex items-center space-x-5">
-            <a href={`tel:${settings.phone_number}`} className="flex items-center hover:text-white transition-colors">
+            {settings.phone_number && <a href={`tel:${settings.phone_number}`} className="flex items-center hover:text-white transition-colors">
               <Phone className="w-3.5 h-3.5 mr-1.5 text-solar-400" />
               {settings.phone_number}
-            </a>
+            </a>}
           </div>
         </div>
       </div>
@@ -99,10 +100,10 @@ export default function Navbar({ settings = INITIAL_SITE_SETTINGS, onOpenSearch 
                 </div>
                 <div>
                   <span className="text-xl font-black tracking-tight text-slate-900 flex items-center">
-                    {settings.company_name || 'MAATI ENERGY'}
+                    {settings.company_name}
                   </span>
                   <p className="text-[10px] text-slate-500 tracking-wide uppercase font-medium hidden sm:block">
-                    {settings.tagline || 'Sustainable. Smart. Indian.'}
+                    {settings.tagline}
                   </p>
                 </div>
               </>
@@ -195,7 +196,7 @@ export default function Navbar({ settings = INITIAL_SITE_SETTINGS, onOpenSearch 
             </div>
 
             <div className="pt-3 border-t border-slate-100">
-              <a
+              {whatsappHref && <a
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -203,7 +204,7 @@ export default function Navbar({ settings = INITIAL_SITE_SETTINGS, onOpenSearch 
               >
                 <MessageCircle className="w-4 h-4 mr-2 text-emerald-600" />
                 Chat with Solar Engineer on WhatsApp
-              </a>
+              </a>}
             </div>
           </div>
         )}

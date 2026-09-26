@@ -125,7 +125,10 @@ export default async function AboutPage() {
     },
   ];
 
-  const whatsappHref = `https://wa.me/${settings.whatsapp_number?.replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Hello Maati Energy team, I read your About page and would like to speak with a solar engineer.')}`;
+  const aboutWhatsappNumber = settings.whatsapp_number.replace(/[^0-9]/g, '');
+  const whatsappHref = aboutWhatsappNumber
+    ? `https://wa.me/${aboutWhatsappNumber}?text=${encodeURIComponent(`Hello ${settings.company_name} team, I read your About page and would like to speak with a solar engineer.`)}`
+    : '';
 
   return (
     <div className="space-y-16 sm:space-y-24">
@@ -430,7 +433,7 @@ export default async function AboutPage() {
                 <Calculator className="w-4 h-4 mr-2" />
                 Calculate Rooftop Savings
               </Link>
-              <a
+              {whatsappHref && <a
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -438,7 +441,7 @@ export default async function AboutPage() {
               >
                 <Phone className="w-4 h-4 mr-2" />
                 Talk to a Solar Engineer
-              </a>
+              </a>}
             </div>
           </div>
         </div>

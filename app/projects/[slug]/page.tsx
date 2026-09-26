@@ -17,8 +17,10 @@ import {
 import { SolarService } from '@/lib/services/solar-service';
 import { Project } from '@/lib/types';
 import { INITIAL_PROJECTS } from '@/lib/data/initial-data';
+import { useSiteSettings } from '@/components/layout/SiteSettingsContext';
 
 export default function ProjectDetailPage() {
+  const settings = useSiteSettings();
   const params = useParams();
   const slug = params.slug as string;
 
@@ -45,8 +47,9 @@ export default function ProjectDetailPage() {
     return notFound();
   }
 
-  const whatsappMsg = `Hello Solaris Team, I saw your project: ${project.title} (${project.capacity} in ${project.location}). I have a similar requirement for my property.`;
-  const whatsappUrl = `https://wa.me/917849067305?text=${encodeURIComponent(whatsappMsg)}`;
+  const whatsappNumber = settings.whatsapp_number.replace(/[^0-9]/g, '');
+  const whatsappMsg = `Hello ${settings.company_name} team, I saw your project: ${project.title} (${project.capacity} in ${project.location}). I have a similar requirement for my property.`;
+  const whatsappUrl = whatsappNumber ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMsg)}` : '';
 
   return (
     <div className="space-y-16 py-12">
@@ -147,7 +150,7 @@ export default function ProjectDetailPage() {
                 >
                   Calculate Rooftop Savings
                 </Link>
-                <a
+                {whatsappUrl && <a
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -155,7 +158,7 @@ export default function ProjectDetailPage() {
                 >
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Inquire via WhatsApp
-                </a>
+                </a>}
               </div>
             </div>
           </div>

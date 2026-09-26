@@ -24,8 +24,7 @@ export function getPool(): Pool | null {
       dbUrl.includes('supabase') ||
       dbUrl.includes('neon.tech') ||
       dbUrl.includes('render.com') ||
-      dbUrl.includes('railway.app') ||
-      process.env.NODE_ENV === 'production';
+      dbUrl.includes('railway.app');
 
     global._pgPool = new Pool({
       connectionString: dbUrl,

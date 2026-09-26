@@ -66,7 +66,7 @@ export default function Footer({ settings = INITIAL_SITE_SETTINGS }: FooterProps
                 <div className="bg-white p-1.5 rounded-xl inline-block shadow-sm">
                   <img
                     src={settings.logo_url}
-                    alt={settings.company_name || 'Maati Energy'}
+                    alt={settings.company_name || 'Company logo'}
                     className="h-10 sm:h-12 w-auto max-w-[200px] object-contain"
                   />
                 </div>
@@ -75,15 +75,11 @@ export default function Footer({ settings = INITIAL_SITE_SETTINGS }: FooterProps
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-solar-500 to-amber-400 flex items-center justify-center text-white shadow-md">
                     <Sun className="w-6 h-6" />
                   </div>
-                  <span className="text-xl font-black text-white tracking-tight">
-                    {settings.company_name || 'MAATI ENERGY'}
-                  </span>
+                  {settings.company_name && <span className="text-xl font-black text-white tracking-tight">{settings.company_name}</span>}
                 </>
               )}
             </Link>
-            <p className="text-sm leading-relaxed text-slate-400 max-w-sm">
-              {settings.company_name || 'Maati Energy'} is a premier EPC contractor delivering turnkey rooftop and utility-scale solar installations across residential, commercial, industrial, and agricultural sectors.
-            </p>
+            {settings.company_name && <p className="text-sm leading-relaxed text-slate-400 max-w-sm">{settings.company_name} delivers turnkey rooftop and utility-scale solar installations across residential, commercial, industrial, and agricultural sectors.</p>}
             <div className="flex items-center space-x-3 pt-2">
               {settings.facebook_url && (
                 <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-slate-900 hover:bg-solar-600 text-slate-400 hover:text-white transition-colors" aria-label="Facebook">
@@ -214,26 +210,26 @@ export default function Footer({ settings = INITIAL_SITE_SETTINGS }: FooterProps
               Headquarters
             </h4>
             <ul className="space-y-3 text-xs leading-relaxed">
-              <li className="flex items-start space-x-2.5">
+              {settings.address && <li className="flex items-start space-x-2.5">
                 <MapPin className="w-4 h-4 text-solar-400 shrink-0 mt-0.5" />
-                <span>{settings.address}</span>
-              </li>
-              <li className="flex items-center space-x-2.5">
+                {settings.google_maps_url ? <a href={settings.google_maps_url} target="_blank" rel="noopener noreferrer" className="hover:text-white">{settings.address}</a> : <span>{settings.address}</span>}
+              </li>}
+              {settings.phone_number && <li className="flex items-center space-x-2.5">
                 <Phone className="w-4 h-4 text-solar-400 shrink-0" />
                 <a href={`tel:${settings.phone_number}`} className="hover:text-white transition-colors">
                   {settings.phone_number}
                 </a>
-              </li>
-              <li className="flex items-center space-x-2.5">
+              </li>}
+              {settings.email && <li className="flex items-center space-x-2.5">
                 <Mail className="w-4 h-4 text-solar-400 shrink-0" />
                 <a href={`mailto:${settings.email}`} className="hover:text-white transition-colors">
                   {settings.email}
                 </a>
-              </li>
-              <li className="flex items-center space-x-2.5">
+              </li>}
+              {settings.working_hours && <li className="flex items-center space-x-2.5">
                 <Clock className="w-4 h-4 text-solar-400 shrink-0" />
                 <span>{settings.working_hours}</span>
-              </li>
+              </li>}
             </ul>
           </div>
         </div>

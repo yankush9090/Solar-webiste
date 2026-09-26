@@ -15,8 +15,10 @@ import {
 import { SolarService } from '@/lib/services/solar-service';
 import { Package } from '@/lib/types';
 import { INITIAL_PACKAGES } from '@/lib/data/initial-data';
+import { useSiteSettings } from '@/components/layout/SiteSettingsContext';
 
 export default function PackageDetailPage() {
+  const settings = useSiteSettings();
   const params = useParams();
   const slug = params.slug as string;
 
@@ -46,8 +48,9 @@ export default function PackageDetailPage() {
   const effectiveCost = pkg.discount_price || pkg.price;
   const netAfterSubsidy = Math.max(effectiveCost - (pkg.estimated_subsidy || 0), 0);
 
-  const whatsappMsg = `Hello Solaris Team, I am interested in booking/inquiring about the ${pkg.name} (${pkg.capacity} ${pkg.system_type}). Please share site survey availability.`;
-  const whatsappUrl = `https://wa.me/917849067305?text=${encodeURIComponent(whatsappMsg)}`;
+  const whatsappNumber = settings.whatsapp_number.replace(/[^0-9]/g, '');
+  const whatsappMsg = `Hello ${settings.company_name} team, I am interested in booking/inquiring about the ${pkg.name} (${pkg.capacity} ${pkg.system_type}). Please share site survey availability.`;
+  const whatsappUrl = whatsappNumber ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMsg)}` : '';
 
   return (
     <div className="space-y-16 py-12">
@@ -187,7 +190,7 @@ export default function PackageDetailPage() {
                 >
                   Schedule Rooftop Survey
                 </Link>
-                <a
+                {whatsappUrl && <a
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -195,7 +198,7 @@ export default function PackageDetailPage() {
                 >
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Book via WhatsApp
-                </a>
+                </a>}
               </div>
             </div>
           </div>

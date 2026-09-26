@@ -24,6 +24,7 @@ export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SITE_SETTINGS);
   const [saving, setSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -34,7 +35,7 @@ export default function AdminSettingsPage() {
         setSettings({
           ...INITIAL_SITE_SETTINGS,
           ...data,
-          logo_url: data.logo_url || '/images/logo.png',
+          logo_url: data.logo_url || '',
         });
       }
     });
@@ -88,6 +89,7 @@ export default function AdminSettingsPage() {
     e.preventDefault();
     setSaving(true);
     setSavedSuccess(false);
+    setSaveError('');
 
     try {
       await SolarService.updateSettings(settings);
@@ -95,9 +97,7 @@ export default function AdminSettingsPage() {
       setTimeout(() => setSavedSuccess(false), 5000);
     } catch (err: any) {
       console.warn('Failed saving settings:', err);
-      // Still show saved confirmation because local/in-memory cache updated
-      setSavedSuccess(true);
-      setTimeout(() => setSavedSuccess(false), 5000);
+      setSaveError(err.message || 'Settings could not be saved. Check the database configuration.');
     } finally {
       setSaving(false);
     }
@@ -113,6 +113,13 @@ export default function AdminSettingsPage() {
           Manage website logo, company branding, contact numbers, address, and social links.
         </p>
       </div>
+
+      {saveError && (
+        <div className="p-4 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold rounded-2xl flex items-center">
+          <AlertCircle className="w-4 h-4 mr-2 text-rose-600" />
+          {saveError}
+        </div>
+      )}
 
       {savedSuccess && (
         <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-2xl flex items-center shadow-sm">
@@ -279,7 +286,7 @@ export default function AdminSettingsPage() {
               <input
                 type="text"
                 required
-                placeholder="+917849067305"
+                placeholder="Enter WhatsApp number"
                 value={settings.whatsapp_number}
                 onChange={(e) => setSettings({ ...settings, whatsapp_number: e.target.value })}
                 className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-solar-500 bg-emerald-50/40 font-mono"
@@ -327,7 +334,7 @@ export default function AdminSettingsPage() {
             <label className="text-xs font-bold text-slate-700 block mb-1">Physical Office Address</label>
             <textarea
               rows={2}
-              value={settings.address}
+              value={settings.address || ''}
               onChange={(e) => setSettings({ ...settings, address: e.target.value })}
               className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-solar-500"
             />

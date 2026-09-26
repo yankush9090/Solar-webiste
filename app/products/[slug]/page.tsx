@@ -15,8 +15,10 @@ import {
 import { SolarService } from '@/lib/services/solar-service';
 import { Product } from '@/lib/types';
 import { INITIAL_PRODUCTS } from '@/lib/data/initial-data';
+import { useSiteSettings } from '@/components/layout/SiteSettingsContext';
 
 export default function ProductDetailPage() {
+  const settings = useSiteSettings();
   const params = useParams();
   const slug = params.slug as string;
 
@@ -43,8 +45,9 @@ export default function ProductDetailPage() {
     return notFound();
   }
 
-  const whatsappMsg = `Hello Solaris Team, I am interested in purchasing/inquiring about the product: ${product.name} (${product.brand} - ${product.model || ''}). Please share available stock and price.`;
-  const whatsappUrl = `https://wa.me/917849067305?text=${encodeURIComponent(whatsappMsg)}`;
+  const whatsappNumber = settings.whatsapp_number.replace(/[^0-9]/g, '');
+  const whatsappMsg = `Hello ${settings.company_name} team, I am interested in purchasing/inquiring about the product: ${product.name} (${product.brand} - ${product.model || ''}). Please share available stock and price.`;
+  const whatsappUrl = whatsappNumber ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMsg)}` : '';
 
   return (
     <div className="space-y-16 py-12">
@@ -157,7 +160,7 @@ export default function ProductDetailPage() {
               >
                 Request Datasheet & Quote
               </Link>
-              <a
+              {whatsappUrl && <a
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -165,7 +168,7 @@ export default function ProductDetailPage() {
               >
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Chat with Product Specialist
-              </a>
+              </a>}
             </div>
           </div>
         </div>

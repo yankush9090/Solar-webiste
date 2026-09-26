@@ -16,8 +16,10 @@ import {
 import { SolarService } from '@/lib/services/solar-service';
 import { Solution } from '@/lib/types';
 import { INITIAL_SOLUTIONS } from '@/lib/data/initial-data';
+import { useSiteSettings } from '@/components/layout/SiteSettingsContext';
 
 export default function SolutionDetailPage() {
+  const settings = useSiteSettings();
   const params = useParams();
   const slug = params.slug as string;
 
@@ -45,8 +47,9 @@ export default function SolutionDetailPage() {
     return notFound();
   }
 
-  const whatsappMsg = `Hello Solaris Team, I would like to inquire about ${solution.title} for my property. Please share full technical specifications and cost estimate.`;
-  const whatsappUrl = `https://wa.me/917849067305?text=${encodeURIComponent(whatsappMsg)}`;
+  const whatsappNumber = settings.whatsapp_number.replace(/[^0-9]/g, '');
+  const whatsappMsg = `Hello ${settings.company_name} team, I would like to inquire about ${solution.title} for my property. Please share full technical specifications and cost estimate.`;
+  const whatsappUrl = whatsappNumber ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMsg)}` : '';
 
   return (
     <div className="space-y-16 py-12">
@@ -84,7 +87,7 @@ export default function SolutionDetailPage() {
                 Calculate Estimated Savings
               </Link>
 
-              <a
+              {whatsappUrl && <a
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -92,7 +95,7 @@ export default function SolutionDetailPage() {
               >
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Inquire on WhatsApp
-              </a>
+              </a>}
             </div>
           </div>
         </div>
@@ -200,14 +203,14 @@ export default function SolutionDetailPage() {
                 >
                   Request Rooftop Site Survey
                 </Link>
-                <a
+                {whatsappUrl && <a
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-3 px-4 rounded-xl text-xs font-bold text-center flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
                 >
                   <MessageCircle className="w-4 h-4 mr-1.5" /> Chat with Engineer
-                </a>
+                </a>}
               </div>
             </div>
           </div>

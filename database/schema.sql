@@ -17,22 +17,78 @@ CREATE TABLE IF NOT EXISTS admin_users (
 -- SITE SETTINGS (Singleton configuration)
 CREATE TABLE IF NOT EXISTS site_settings (
   id INT PRIMARY KEY DEFAULT 1,
-  company_name TEXT NOT NULL DEFAULT 'Solaris Energy Solutions',
-  tagline TEXT DEFAULT 'Leading Solar Engineering, Procurement & Commissioning (EPC) Company',
-  logo_url TEXT DEFAULT '/images/logo.svg',
-  favicon_url TEXT DEFAULT '/favicon.ico',
-  phone_number TEXT NOT NULL DEFAULT '+91 78490 67305',
-  whatsapp_number TEXT NOT NULL DEFAULT '+917849067305',
-  email TEXT NOT NULL DEFAULT 'info@maatienergy.com',
-  address TEXT NOT NULL DEFAULT 'Plot 42, EcoTech Renewable Corridor, Outer Ring Road, Bengaluru, Karnataka 560103',
-  working_hours TEXT DEFAULT 'Monday – Saturday: 9:00 AM – 7:00 PM',
+  company_name TEXT,
+  tagline TEXT,
+  logo_url TEXT,
+  favicon_url TEXT,
+  phone_number TEXT,
+  whatsapp_number TEXT,
+  email TEXT,
+  address TEXT,
+  working_hours TEXT,
   google_maps_url TEXT,
-  facebook_url TEXT DEFAULT 'https://facebook.com',
-  instagram_url TEXT DEFAULT 'https://instagram.com',
-  linkedin_url TEXT DEFAULT 'https://linkedin.com',
-  youtube_url TEXT DEFAULT 'https://youtube.com',
+  facebook_url TEXT,
+  instagram_url TEXT,
+  linkedin_url TEXT,
+  youtube_url TEXT,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Website settings are admin-managed. Remove defaults when upgrading an existing database.
+ALTER TABLE site_settings ALTER COLUMN company_name DROP DEFAULT;
+ALTER TABLE site_settings ALTER COLUMN tagline DROP DEFAULT;
+ALTER TABLE site_settings ALTER COLUMN logo_url DROP DEFAULT;
+ALTER TABLE site_settings ALTER COLUMN favicon_url DROP DEFAULT;
+ALTER TABLE site_settings ALTER COLUMN phone_number DROP DEFAULT;
+ALTER TABLE site_settings ALTER COLUMN whatsapp_number DROP DEFAULT;
+ALTER TABLE site_settings ALTER COLUMN email DROP DEFAULT;
+ALTER TABLE site_settings ALTER COLUMN address DROP DEFAULT;
+ALTER TABLE site_settings ALTER COLUMN working_hours DROP DEFAULT;
+ALTER TABLE site_settings ALTER COLUMN facebook_url DROP DEFAULT;
+ALTER TABLE site_settings ALTER COLUMN instagram_url DROP DEFAULT;
+ALTER TABLE site_settings ALTER COLUMN linkedin_url DROP DEFAULT;
+ALTER TABLE site_settings ALTER COLUMN youtube_url DROP DEFAULT;
+
+-- Remove only the original seed values when upgrading an existing database.
+UPDATE site_settings
+SET company_name = NULL
+WHERE company_name = 'Solaris Energy Solutions';
+UPDATE site_settings
+SET tagline = NULL
+WHERE tagline = 'Leading Solar Engineering, Procurement & Commissioning (EPC) Company';
+UPDATE site_settings
+SET logo_url = NULL
+WHERE logo_url = '/images/logo.svg';
+UPDATE site_settings
+SET favicon_url = NULL
+WHERE favicon_url = '/favicon.ico';
+UPDATE site_settings
+SET phone_number = NULL
+WHERE phone_number = '+91 78490 67305';
+UPDATE site_settings
+SET whatsapp_number = NULL
+WHERE whatsapp_number = '+917849067305';
+UPDATE site_settings
+SET email = NULL
+WHERE email = 'info@maatienergy.com';
+UPDATE site_settings
+SET address = NULL
+WHERE address = 'Plot 42, EcoTech Renewable Corridor, Outer Ring Road, Bengaluru, Karnataka 560103';
+UPDATE site_settings
+SET working_hours = NULL
+WHERE working_hours = 'Monday – Saturday: 9:00 AM – 7:00 PM';
+UPDATE site_settings
+SET facebook_url = NULL
+WHERE facebook_url = 'https://facebook.com';
+UPDATE site_settings
+SET instagram_url = NULL
+WHERE instagram_url = 'https://instagram.com';
+UPDATE site_settings
+SET linkedin_url = NULL
+WHERE linkedin_url = 'https://linkedin.com';
+UPDATE site_settings
+SET youtube_url = NULL
+WHERE youtube_url = 'https://youtube.com';
 
 -- HOMEPAGE STATS
 CREATE TABLE IF NOT EXISTS homepage_stats (
@@ -271,19 +327,6 @@ CREATE INDEX IF NOT EXISTS idx_enquiries_created ON enquiries(created_at DESC);
 INSERT INTO admin_users (email, password_hash, name, role)
 VALUES ('admin@solarisenergy.com', 'solaradmin2025', 'Solaris Senior Admin', 'admin')
 ON CONFLICT (email) DO NOTHING;
-
--- Site Settings
-INSERT INTO site_settings (id, company_name, tagline, phone_number, whatsapp_number, email, address, working_hours)
-VALUES (
-  1,
-  'Solaris Energy Solutions',
-  'Leading Solar Engineering, Procurement & Commissioning (EPC) Company',
-  '+91 78490 67305',
-  '+917849067305',
-  'info@maatienergy.com',
-  'Plot 42, EcoTech Renewable Corridor, Outer Ring Road, Bengaluru, Karnataka 560103',
-  'Monday – Saturday: 9:00 AM – 7:00 PM'
-) ON CONFLICT (id) DO NOTHING;
 
 -- Calculator Settings
 INSERT INTO calculator_settings (id, cost_per_kw, generation_per_kw_per_month, default_tariff, co2_factor, maintenance_percent)

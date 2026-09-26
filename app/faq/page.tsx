@@ -12,8 +12,10 @@ import {
 import { SolarService } from '@/lib/services/solar-service';
 import { FAQ } from '@/lib/types';
 import { INITIAL_FAQS } from '@/lib/data/initial-data';
+import { useSiteSettings } from '@/components/layout/SiteSettingsContext';
 
 export default function FaqPage() {
+  const settings = useSiteSettings();
   const [faqs, setFaqs] = useState<FAQ[]>(INITIAL_FAQS);
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [search, setSearch] = useState<string>('');
@@ -32,6 +34,10 @@ export default function FaqPage() {
       faq.answer.toLowerCase().includes(search.toLowerCase());
     return matchesCat && matchesSearch;
   });
+  const whatsappNumber = settings.whatsapp_number.replace(/[^0-9]/g, '');
+  const whatsappHref = whatsappNumber
+    ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hello, I have a question about solar.')}`
+    : '';
 
   return (
     <div className="space-y-16 py-12">
@@ -131,15 +137,15 @@ export default function FaqPage() {
             Our solar technical advisors are available on WhatsApp and phone to assist with any questions.
           </p>
           <div className="flex justify-center gap-3 pt-2">
-            <a
-              href="https://wa.me/917849067305?text=Hello%2C%20I%20have%20a%20question%20about%20solar."
+            {whatsappHref && <a
+              href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
               className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center shadow"
             >
               <MessageCircle className="w-4 h-4 mr-1.5" />
               Ask on WhatsApp
-            </a>
+            </a>}
             <Link
               href="/contact"
               className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl border border-slate-700"

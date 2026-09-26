@@ -16,10 +16,16 @@ import {
 import { SolarService } from '@/lib/services/solar-service';
 import { BlogPost } from '@/lib/types';
 import { INITIAL_BLOG_POSTS } from '@/lib/data/initial-data';
+import { useSiteSettings } from '@/components/layout/SiteSettingsContext';
 
 export default function BlogPostDetailPage() {
+  const settings = useSiteSettings();
   const params = useParams();
   const slug = params.slug as string;
+  const whatsappNumber = settings.whatsapp_number.replace(/[^0-9]/g, '');
+  const whatsappHref = whatsappNumber
+    ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hello, I read your solar guide and have a question.')}`
+    : '';
 
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
@@ -145,15 +151,15 @@ export default function BlogPostDetailPage() {
             >
               Calculate My Savings
             </Link>
-            <a
-              href="https://wa.me/917849067305?text=Hello%2C%20I%20read%20your%20solar%20guide%20and%20have%20a%20question."
+            {whatsappHref && <a
+              href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-3 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all flex items-center"
             >
               <MessageCircle className="w-4 h-4 mr-1.5" />
               Chat on WhatsApp
-            </a>
+            </a>}
           </div>
         </div>
       </article>

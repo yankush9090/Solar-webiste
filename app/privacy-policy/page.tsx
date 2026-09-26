@@ -1,11 +1,14 @@
 import React from 'react';
+import { getSettingsAction } from '@/lib/db/actions';
+import { INITIAL_SITE_SETTINGS } from '@/lib/data/initial-data';
 
 export const metadata = {
   title: 'Privacy Policy | Solaris Energy Solutions',
   description: 'Learn how Solaris Energy collects, protects, and handles your customer and site information.',
 };
 
-export default function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage() {
+  const settings = await getSettingsAction().catch(() => INITIAL_SITE_SETTINGS);
   return (
     <div className="max-w-4xl mx-auto px-4 py-16 text-slate-800 space-y-6">
       <h1 className="text-3xl font-black text-slate-900 tracking-tight">Privacy Policy</h1>
@@ -29,7 +32,7 @@ export default function PrivacyPolicyPage() {
 
         <h2 className="text-lg font-bold text-slate-900">4. Contact Us</h2>
         <p>
-          If you have any questions regarding your data or wish to delete your records, please reach out to us at <strong>info@maatienergy.com</strong>.
+          If you have any questions regarding your data or wish to delete your records, please reach out to us {settings.email ? <>at <a className="font-semibold underline" href={`mailto:${settings.email}`}>{settings.email}</a></> : 'through our contact page'}.
         </p>
       </section>
     </div>

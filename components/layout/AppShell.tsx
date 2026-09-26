@@ -6,6 +6,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import WhatsAppFloating from '../whatsapp/WhatsAppFloating';
 import GlobalSearchModal from '../search/GlobalSearchModal';
+import { SiteSettingsProvider } from './SiteSettingsContext';
 import { SiteSettings } from '@/lib/types';
 import { getSettingsAction } from '@/lib/db/actions';
 import { INITIAL_SITE_SETTINGS } from '@/lib/data/initial-data';
@@ -32,18 +33,20 @@ export default function AppShell({ children }: AppShellProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-solar-500 selection:text-white">
-      <Navbar settings={settings} onOpenSearch={() => setIsSearchOpen(true)} />
+    <SiteSettingsProvider settings={settings}>
+      <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-solar-500 selection:text-white">
+        <Navbar settings={settings} onOpenSearch={() => setIsSearchOpen(true)} />
 
-      <main className="flex-grow">
-        {children}
-      </main>
+        <main className="flex-grow">
+          {children}
+        </main>
 
-      <Footer settings={settings} />
+        <Footer settings={settings} />
 
-      <WhatsAppFloating whatsappNumber={settings.whatsapp_number} />
+        <WhatsAppFloating whatsappNumber={settings.whatsapp_number} />
 
-      <GlobalSearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
-    </div>
+        <GlobalSearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      </div>
+    </SiteSettingsProvider>
   );
 }

@@ -26,7 +26,7 @@ interface SolarCalculatorProps {
 
 export default function SolarCalculator({
   initialSettings = INITIAL_CALCULATOR_SETTINGS,
-  whatsappNumber = '+917849067305'
+  whatsappNumber = ''
 }: SolarCalculatorProps) {
   // Input states
   const [bill, setBill] = useState<number>(4500);
@@ -94,8 +94,8 @@ export default function SolarCalculator({
 
   // Pre-filled WhatsApp link with calculation summary
   const cleanPhone = whatsappNumber.replace(/[^0-9]/g, '');
-  const whatsappMsg = `Hello Solaris Team, I used your Solar Calculator:\n- Monthly Bill: ₹${bill.toLocaleString('en-IN')}\n- Recommended: ${results.recommended_capacity_kw} kW (${systemType})\n- Estimated Subsidy: ₹${results.estimated_subsidy.toLocaleString('en-IN')}\n- Net Cost: ₹${results.estimated_net_cost.toLocaleString('en-IN')}\n- City: ${city}, ${state}\nI would like to get a formal quote and roof survey.`;
-  const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(whatsappMsg)}`;
+  const whatsappMsg = `Hello, I used your Solar Calculator:\n- Monthly Bill: ₹${bill.toLocaleString('en-IN')}\n- Recommended: ${results.recommended_capacity_kw} kW (${systemType})\n- Estimated Subsidy: ₹${results.estimated_subsidy.toLocaleString('en-IN')}\n- Net Cost: ₹${results.estimated_net_cost.toLocaleString('en-IN')}\n- City: ${city}, ${state}\nI would like to get a formal quote and roof survey.`;
+  const whatsappUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(whatsappMsg)}` : '';
 
   return (
     <div className="bg-white rounded-3xl shadow-xl border border-slate-200/80 overflow-hidden">
@@ -386,14 +386,14 @@ export default function SolarCalculator({
                     {submitting ? 'Submitting...' : 'Get Detailed Turnkey Quote'}
                   </button>
 
-                  <a
+                  {whatsappUrl && <a
                     href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center py-3 px-4 text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow transition-all shrink-0"
                   >
                     <MessageCircle className="w-4 h-4 mr-1.5" /> Discuss on WhatsApp
-                  </a>
+                  </a>}
                 </div>
               </form>
             ) : (
@@ -406,14 +406,14 @@ export default function SolarCalculator({
                   Your solar savings estimation for a {results.recommended_capacity_kw} kW system has been registered. Our technical advisor will contact you within 2 business hours.
                 </p>
                 <div className="pt-2">
-                  <a
+                  {whatsappUrl && <a
                     href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center px-4 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all"
                   >
                     <MessageCircle className="w-4 h-4 mr-1.5" /> Skip the wait & WhatsApp Us Now
-                  </a>
+                  </a>}
                 </div>
               </div>
             )}

@@ -59,6 +59,10 @@ export default async function HomePage() {
     getCalculatorSettingsAction().catch(() => INITIAL_CALCULATOR_SETTINGS),
     getSettingsAction().catch(() => INITIAL_SITE_SETTINGS),
   ]);
+  const whatsappNumber = siteSettings.whatsapp_number.replace(/[^0-9]/g, '');
+  const whatsappHref = whatsappNumber
+    ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hello, I would like to schedule a solar site inspection.')}`
+    : '';
 
   return (
     <div className="space-y-16 sm:space-y-24">
@@ -588,15 +592,15 @@ export default async function HomePage() {
               >
                 Schedule Free Site Inspection
               </Link>
-              <a
-                href="https://wa.me/917849067305?text=Hello%2C%20I%20would%20like%20to%20schedule%20a%20solar%20site%20inspection."
+              {whatsappHref && <a
+                href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-6 py-3.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow transition-all flex items-center"
               >
                 <MessageCircle className="w-4 h-4 mr-2" />
                 WhatsApp Solar Specialist
-              </a>
+              </a>}
             </div>
           </div>
         </div>

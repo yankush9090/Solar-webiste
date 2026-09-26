@@ -188,7 +188,7 @@ cp .env.example .env.local
 Populate the configuration values:
 
 ```env
-# PostgreSQL Database Connection URL (Optional: Leave blank to use Built-in Demo Data)
+# PostgreSQL Database Connection URL (required for persistent admin changes)
 DATABASE_URL=postgresql://postgres:your_password@localhost:5432/solaris_db
 
 # Public URL & Contact Hotlines
@@ -244,13 +244,20 @@ Or copy the contents of [`database/schema.sql`](file:///d:/Solar/database/schema
 
 ---
 
-### Graceful Fallback Mode
+### Local Demo Fallback
 
 > **Zero Setup Required for Local Testing!**
 >
-> If `DATABASE_URL` is omitted from `.env.local` or PostgreSQL is unreachable, the system automatically falls back to high-fidelity in-memory seed data defined in [`lib/data/initial-data.ts`](file:///d:/Solar/lib/data/initial-data.ts). 
+> If `DATABASE_URL` is omitted from `.env.local` or PostgreSQL is unreachable, public pages can still render using high-fidelity in-memory seed data defined in [`lib/data/initial-data.ts`](file:///d:/Solar/lib/data/initial-data.ts). Admin changes require PostgreSQL and will show an error until it is configured.
 > 
-> All pages, calculators, and admin panels will render seamlessly without errors.
+> The fallback is temporary runtime data and is cleared when the server restarts. Do not use it for production CMS content.
+
+### Production Persistence Checklist
+
+1. Create a persistent PostgreSQL database (Supabase, Neon, or another managed provider).
+2. Run `database/schema.sql` against that database.
+3. Set `DATABASE_URL` in the hosting provider's server environment variables. A local `.env.local` value is not available to the deployed server.
+4. Redeploy and verify the admin save operation. If the connection or schema is invalid, the admin page will show the database error instead of reporting a false success.
 
 ---
 

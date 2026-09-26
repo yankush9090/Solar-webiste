@@ -14,6 +14,12 @@ function purgeCache() {
     // Ignore in non-request contexts
   }
 }
+
+function requirePersistentStorage() {
+  if (!isPostgresConfigured()) {
+    throw new Error('Persistent storage is not configured. Set DATABASE_URL before saving admin changes.');
+  }
+}
 import {
   SiteSettings,
   HomepageStat,
@@ -224,8 +230,26 @@ export async function getSettingsAction(): Promise<SiteSettings> {
       const res = await query('SELECT * FROM site_settings WHERE id = 1 LIMIT 1');
       if (res && res.rows.length > 0) {
         const dbSettings = res.rows[0] as SiteSettings;
-        global._siteSettingsStore = dbSettings;
-        return dbSettings;
+        const normalizedSettings: SiteSettings = {
+          ...INITIAL_SITE_SETTINGS,
+          ...dbSettings,
+          company_name: dbSettings.company_name || '',
+          tagline: dbSettings.tagline || '',
+          logo_url: dbSettings.logo_url || '',
+          favicon_url: dbSettings.favicon_url || '',
+          phone_number: dbSettings.phone_number || '',
+          whatsapp_number: dbSettings.whatsapp_number || '',
+          email: dbSettings.email || '',
+          address: dbSettings.address || '',
+          working_hours: dbSettings.working_hours || '',
+          google_maps_url: dbSettings.google_maps_url || '',
+          facebook_url: dbSettings.facebook_url || '',
+          instagram_url: dbSettings.instagram_url || '',
+          linkedin_url: dbSettings.linkedin_url || '',
+          youtube_url: dbSettings.youtube_url || '',
+        };
+        global._siteSettingsStore = normalizedSettings;
+        return normalizedSettings;
       }
     } catch (err) {
       console.warn('getSettingsAction database query notice:', err);
@@ -235,6 +259,7 @@ export async function getSettingsAction(): Promise<SiteSettings> {
 }
 
 export async function saveSettingsAction(settings: Partial<SiteSettings>): Promise<SiteSettings> {
+  requirePersistentStorage();
   const updated = setLocalSettings(settings);
   if (isPostgresConfigured()) {
     try {
@@ -263,22 +288,22 @@ export async function saveSettingsAction(settings: Partial<SiteSettings>): Promi
         [
           updated.company_name,
           updated.tagline,
-          updated.logo_url || '/images/logo.png',
-          updated.favicon_url || '/favicon.ico',
-          updated.google_maps_url || 'https://maps.google.com',
-          updated.phone_number,
-          updated.whatsapp_number,
-          updated.email,
-          updated.address,
-          updated.working_hours,
-          updated.facebook_url,
-          updated.instagram_url,
-          updated.linkedin_url,
-          updated.youtube_url,
+          updated.logo_url || null,
+          updated.favicon_url || null,
+          updated.google_maps_url || null,
+          updated.phone_number || null,
+          updated.whatsapp_number || null,
+          updated.email || null,
+          updated.address || null,
+          updated.working_hours || null,
+          updated.facebook_url || null,
+          updated.instagram_url || null,
+          updated.linkedin_url || null,
+          updated.youtube_url || null,
         ]
       );
     } catch (err: any) {
-      console.warn('Database write notice in saveSettingsAction:', err);
+      throw new Error(`Could not save settings to PostgreSQL: ${err.message || err}`);
     }
   }
   purgeCache();
@@ -317,6 +342,7 @@ export async function getSolutionsAction(): Promise<Solution[]> {
 }
 
 export async function saveSolutionAction(solution: Solution): Promise<void> {
+  requirePersistentStorage();
   setLocalSolution(solution);
   if (isPostgresConfigured()) {
     try {
@@ -351,7 +377,7 @@ export async function saveSolutionAction(solution: Solution): Promise<void> {
         ]
       );
     } catch (err: any) {
-      console.warn('Database write notice in saveSolutionAction:', err);
+      throw new Error(`Could not save solution to PostgreSQL: ${err.message || err}`);
     }
   }
   purgeCache();
@@ -388,6 +414,7 @@ export async function getProductCategoriesAction(): Promise<ProductCategory[]> {
 }
 
 export async function saveProductAction(product: Product): Promise<void> {
+  requirePersistentStorage();
   setLocalProduct(product);
   if (isPostgresConfigured()) {
     try {
@@ -430,7 +457,7 @@ export async function saveProductAction(product: Product): Promise<void> {
         ]
       );
     } catch (err: any) {
-      console.warn('Database write notice in saveProductAction:', err);
+      throw new Error(`Could not save product to PostgreSQL: ${err.message || err}`);
     }
   }
   purgeCache();
@@ -453,6 +480,7 @@ export async function getPackagesAction(): Promise<Package[]> {
 }
 
 export async function savePackageAction(pkg: Package): Promise<void> {
+  requirePersistentStorage();
   setLocalPackage(pkg);
   if (isPostgresConfigured()) {
     try {
@@ -493,7 +521,7 @@ export async function savePackageAction(pkg: Package): Promise<void> {
         ]
       );
     } catch (err: any) {
-      console.warn('Database write notice in savePackageAction:', err);
+      throw new Error(`Could not save package to PostgreSQL: ${err.message || err}`);
     }
   }
   purgeCache();
@@ -516,6 +544,7 @@ export async function getProjectsAction(): Promise<Project[]> {
 }
 
 export async function saveProjectAction(project: Project): Promise<void> {
+  requirePersistentStorage();
   setLocalProject(project);
   if (isPostgresConfigured()) {
     try {
@@ -554,7 +583,7 @@ export async function saveProjectAction(project: Project): Promise<void> {
         ]
       );
     } catch (err: any) {
-      console.warn('Database write notice in saveProjectAction:', err);
+      throw new Error(`Could not save project to PostgreSQL: ${err.message || err}`);
     }
   }
   purgeCache();
@@ -577,6 +606,7 @@ export async function getTestimonialsAction(): Promise<Testimonial[]> {
 }
 
 export async function saveTestimonialAction(t: Testimonial): Promise<void> {
+  requirePersistentStorage();
   setLocalTestimonial(t);
   if (isPostgresConfigured()) {
     try {
@@ -591,7 +621,7 @@ export async function saveTestimonialAction(t: Testimonial): Promise<void> {
         [t.id, t.customer_name, t.location, t.photo_url || null, t.review, t.rating || 5, t.project_info || null, t.display_order || 0, t.active ?? true]
       );
     } catch (err: any) {
-      console.warn('Database write notice in saveTestimonialAction:', err);
+      throw new Error(`Could not save testimonial to PostgreSQL: ${err.message || err}`);
     }
   }
   purgeCache();
@@ -613,6 +643,7 @@ export async function getFaqsAction(): Promise<FAQ[]> {
 }
 
 export async function saveFaqAction(f: FAQ): Promise<void> {
+  requirePersistentStorage();
   setLocalFaq(f);
   if (isPostgresConfigured()) {
     try {
@@ -626,7 +657,7 @@ export async function saveFaqAction(f: FAQ): Promise<void> {
         [f.id, f.question, f.answer, f.category, f.display_order || 0, f.active ?? true]
       );
     } catch (err: any) {
-      console.warn('Database write notice in saveFaqAction:', err);
+      throw new Error(`Could not save FAQ to PostgreSQL: ${err.message || err}`);
     }
   }
   purgeCache();
@@ -649,6 +680,7 @@ export async function getBlogPostsAction(): Promise<BlogPost[]> {
 }
 
 export async function saveBlogPostAction(b: BlogPost): Promise<void> {
+  requirePersistentStorage();
   setLocalBlogPost(b);
   if (isPostgresConfigured()) {
     try {
@@ -682,7 +714,7 @@ export async function saveBlogPostAction(b: BlogPost): Promise<void> {
         ]
       );
     } catch (err: any) {
-      console.warn('Database write notice in saveBlogPostAction:', err);
+      throw new Error(`Could not save blog post to PostgreSQL: ${err.message || err}`);
     }
   }
   purgeCache();
@@ -705,6 +737,7 @@ export async function getSubsidyAction(): Promise<SubsidyScheme> {
 }
 
 export async function saveSubsidyAction(s: Partial<SubsidyScheme>): Promise<SubsidyScheme> {
+  requirePersistentStorage();
   const updated = setLocalSubsidy(s);
   if (isPostgresConfigured()) {
     try {
@@ -720,7 +753,7 @@ export async function saveSubsidyAction(s: Partial<SubsidyScheme>): Promise<Subs
         [s.name, s.overview, s.notes, s.portal_url]
       );
     } catch (err: any) {
-      console.warn('Database write notice in saveSubsidyAction:', err);
+      throw new Error(`Could not save subsidy to PostgreSQL: ${err.message || err}`);
     }
   }
   purgeCache();
@@ -758,6 +791,7 @@ export async function getCalculatorSettingsAction(): Promise<CalculatorSettings>
 }
 
 export async function saveCalculatorSettingsAction(c: Partial<CalculatorSettings>): Promise<CalculatorSettings> {
+  requirePersistentStorage();
   const updated = setLocalCalculatorSettings(c);
   if (isPostgresConfigured()) {
     try {
@@ -773,7 +807,7 @@ export async function saveCalculatorSettingsAction(c: Partial<CalculatorSettings
         [c.cost_per_kw, c.generation_per_kw_per_month, c.default_tariff, c.co2_factor, c.maintenance_percent || 1.5]
       );
     } catch (err: any) {
-      console.warn('Database write notice in saveCalculatorSettingsAction:', err);
+      throw new Error(`Could not save calculator settings to PostgreSQL: ${err.message || err}`);
     }
   }
   purgeCache();
@@ -833,16 +867,14 @@ export async function getEnquiriesAction(): Promise<Enquiry[]> {
 }
 
 export async function updateEnquiryStatusAction(id: string, status: Enquiry['status']): Promise<void> {
-  if (isPostgresConfigured()) {
-    await query('UPDATE enquiries SET status = $1, updated_at = NOW() WHERE id = $2', [status, id]);
-  }
+  requirePersistentStorage();
+  await query('UPDATE enquiries SET status = $1, updated_at = NOW() WHERE id = $2', [status, id]);
   purgeCache();
 }
 
 export async function deleteEnquiryAction(id: string): Promise<void> {
-  if (isPostgresConfigured()) {
-    await query('DELETE FROM enquiries WHERE id = $1', [id]);
-  }
+  requirePersistentStorage();
+  await query('DELETE FROM enquiries WHERE id = $1', [id]);
   purgeCache();
 }
 
@@ -912,21 +944,16 @@ export async function getMediaItemsAction(): Promise<MediaItem[]> {
 }
 
 export async function saveMediaItemAction(item: MediaItem): Promise<{ success: boolean; item: MediaItem }> {
-  if (isPostgresConfigured()) {
-    try {
-      await query(`
-        INSERT INTO media_items (id, name, category, type, size, url, alt_text, uploaded_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        ON CONFLICT (id) DO UPDATE SET
-          name = EXCLUDED.name,
-          category = EXCLUDED.category,
-          url = EXCLUDED.url,
-          alt_text = EXCLUDED.alt_text;
-      `, [item.id, item.name, item.category || 'General', item.type || 'image/jpeg', item.size || '1.0 MB', item.url, item.alt_text || item.name, item.uploaded_at || new Date().toISOString().split('T')[0]]);
-    } catch (err) {
-      console.warn('PostgreSQL media save notice:', err);
-    }
-  }
+  requirePersistentStorage();
+  await query(`
+    INSERT INTO media_items (id, name, category, type, size, url, alt_text, uploaded_at)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    ON CONFLICT (id) DO UPDATE SET
+      name = EXCLUDED.name,
+      category = EXCLUDED.category,
+      url = EXCLUDED.url,
+      alt_text = EXCLUDED.alt_text;
+  `, [item.id, item.name, item.category || 'General', item.type || 'image/jpeg', item.size || '1.0 MB', item.url, item.alt_text || item.name, item.uploaded_at || new Date().toISOString().split('T')[0]]);
   const existingIdx = _localMediaItems.findIndex(m => m.id === item.id);
   if (existingIdx >= 0) {
     _localMediaItems[existingIdx] = item;
@@ -938,13 +965,8 @@ export async function saveMediaItemAction(item: MediaItem): Promise<{ success: b
 }
 
 export async function deleteMediaItemAction(id: string): Promise<{ success: boolean }> {
-  if (isPostgresConfigured()) {
-    try {
-      await query('DELETE FROM media_items WHERE id = $1', [id]);
-    } catch (err) {
-      console.warn('PostgreSQL media delete notice:', err);
-    }
-  }
+  requirePersistentStorage();
+  await query('DELETE FROM media_items WHERE id = $1', [id]);
   _localMediaItems = _localMediaItems.filter(m => m.id !== id);
   purgeCache();
   return { success: true };

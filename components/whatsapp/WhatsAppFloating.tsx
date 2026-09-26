@@ -10,7 +10,7 @@ interface WhatsAppFloatingProps {
 }
 
 export default function WhatsAppFloating({
-  whatsappNumber = '+917849067305',
+  whatsappNumber = '',
   customMessage,
 }: WhatsAppFloatingProps) {
   const pathname = usePathname();
@@ -43,12 +43,14 @@ export default function WhatsAppFloating({
     if (pathname.includes('/contact')) {
       return 'Hello, I would like to book a free rooftop solar site survey.';
     }
-    return 'Hello, I am interested in solar rooftop installation with Maati Energy.';
+    return 'Hello, I am interested in solar rooftop installation.';
   };
 
   const cleanNumber = (whatsappNumber || '').replace(/[^0-9]/g, '');
   const message = getContextualMessage();
   const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+
+  if (!cleanNumber) return null;
 
   return (
     <aside aria-label="WhatsApp quick contact" className="fixed bottom-6 right-6 z-50 flex items-center group">

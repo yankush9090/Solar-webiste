@@ -13,8 +13,10 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { SolarService } from '@/lib/services/solar-service';
+import { useSiteSettings } from '@/components/layout/SiteSettingsContext';
 
 export default function ContactPage() {
+  const settings = useSiteSettings();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -26,6 +28,10 @@ export default function ContactPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const whatsappNumber = settings.whatsapp_number.replace(/[^0-9]/g, '');
+  const whatsappHref = whatsappNumber
+    ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hello, I would like to enquire about solar solutions.')}`
+    : '';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -257,46 +263,52 @@ export default function ContactPage() {
           <div className="lg:col-span-5 space-y-6">
             <div className="bg-slate-900 text-white p-8 rounded-3xl space-y-6 border border-slate-800">
               <h3 className="text-xl font-bold text-white">
-                Contact Solaris Energy
+                Contact {settings.company_name}
               </h3>
 
               <div className="space-y-4 text-xs sm:text-sm">
-                <div className="flex items-start space-x-3 text-slate-300">
-                  <MapPin className="w-5 h-5 text-solar-400 shrink-0 mt-0.5" />
-                  <span>Plot 42, EcoTech Renewable Corridor, Outer Ring Road, Bengaluru, Karnataka 560103</span>
-                </div>
+                {settings.address && (
+                  <div className="flex items-start space-x-3 text-slate-300">
+                    <MapPin className="w-5 h-5 text-solar-400 shrink-0 mt-0.5" />
+                    {settings.google_maps_url ? (
+                      <a href={settings.google_maps_url} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">{settings.address}</a>
+                    ) : <span>{settings.address}</span>}
+                  </div>
+                )}
 
-                <div className="flex items-center space-x-3 text-slate-300">
-                  <Phone className="w-5 h-5 text-solar-400 shrink-0" />
-                  <a href="tel:+917849067305" className="hover:text-white transition-colors">
-                    +91 78490 67305
-                  </a>
-                </div>
+                {settings.phone_number && (
+                  <div className="flex items-center space-x-3 text-slate-300">
+                    <Phone className="w-5 h-5 text-solar-400 shrink-0" />
+                    <a href={`tel:${settings.phone_number}`} className="hover:text-white transition-colors">{settings.phone_number}</a>
+                  </div>
+                )}
 
-                <div className="flex items-center space-x-3 text-slate-300">
-                  <Mail className="w-5 h-5 text-solar-400 shrink-0" />
-                  <a href="mailto:info@maatienergy.com" className="hover:text-white transition-colors">
-                    info@maatienergy.com
-                  </a>
-                </div>
+                {settings.email && (
+                  <div className="flex items-center space-x-3 text-slate-300">
+                    <Mail className="w-5 h-5 text-solar-400 shrink-0" />
+                    <a href={`mailto:${settings.email}`} className="hover:text-white transition-colors">{settings.email}</a>
+                  </div>
+                )}
 
-                <div className="flex items-center space-x-3 text-slate-300">
-                  <Clock className="w-5 h-5 text-solar-400 shrink-0" />
-                  <span>Monday – Saturday: 9:00 AM – 7:00 PM</span>
-                </div>
+                {settings.working_hours && (
+                  <div className="flex items-center space-x-3 text-slate-300">
+                    <Clock className="w-5 h-5 text-solar-400 shrink-0" />
+                    <span>{settings.working_hours}</span>
+                  </div>
+                )}
               </div>
 
               <div className="pt-4 border-t border-slate-800 space-y-2.5">
                 <p className="text-xs font-semibold text-slate-400">Need immediate answers?</p>
-                <a
-                  href="https://wa.me/917849067305?text=Hello%2C%20I%20would%20like%20to%20enquire%20about%20solar%20solutions."
+                {whatsappHref && <a
+                  href={whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center transition-colors shadow"
                 >
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Chat Directly on WhatsApp
-                </a>
+                </a>}
               </div>
             </div>
 

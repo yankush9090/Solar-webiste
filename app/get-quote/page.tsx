@@ -18,8 +18,10 @@ import {
   Sparkles
 } from 'lucide-react';
 import { SolarService } from '@/lib/services/solar-service';
+import { useSiteSettings } from '@/components/layout/SiteSettingsContext';
 
 export default function GetQuotePage() {
+  const settings = useSiteSettings();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -93,9 +95,10 @@ export default function GetQuotePage() {
     }
   };
 
-  const whatsappHref = `https://wa.me/917849067305?text=${encodeURIComponent(
-    `Hello Solaris team, I requested a quote for a ${formData.propertyType} ${formData.solarType} system (Monthly Bill: ₹${formData.monthlyBill}). Please share proposal details.`
-  )}`;
+  const cleanWhatsappNumber = settings.whatsapp_number.replace(/[^0-9]/g, '');
+  const whatsappHref = cleanWhatsappNumber ? `https://wa.me/${cleanWhatsappNumber}?text=${encodeURIComponent(
+    `Hello ${settings.company_name} team, I requested a quote for a ${formData.propertyType} ${formData.solarType} system (Monthly Bill: ₹${formData.monthlyBill}). Please share proposal details.`
+  )}` : '';
 
   return (
     <div className="min-h-[85vh] bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center text-slate-100">
@@ -158,7 +161,7 @@ export default function GetQuotePage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <a
+              {whatsappHref && <a
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -166,7 +169,7 @@ export default function GetQuotePage() {
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>Chat on WhatsApp Instantly</span>
-              </a>
+              </a>}
               <Link
                 href="/"
                 className="w-full sm:w-auto px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl border border-slate-700 transition-all text-center"
