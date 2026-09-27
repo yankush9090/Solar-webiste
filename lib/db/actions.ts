@@ -256,7 +256,6 @@ export async function getSettingsAction(): Promise<SiteSettings> {
       }
     } catch (err) {
       console.warn('getSettingsAction database query notice:', err);
-      if (process.env.VERCEL) throw err;
     }
   }
   return getLocalSettings();
@@ -267,7 +266,11 @@ export async function saveSettingsAction(
 ): Promise<{ success: true } | { success: false; error: string }> {
   try {
     requirePersistentStorage();
-    const updated = setLocalSettings(settings);
+    const updated = {
+      ...getLocalSettings(),
+      ...settings,
+      updated_at: new Date().toISOString(),
+    };
     await query(
         `INSERT INTO site_settings (
           id, company_name, tagline, logo_url, favicon_url, google_maps_url,
@@ -307,6 +310,7 @@ export async function saveSettingsAction(
           updated.youtube_url || null,
         ]
     );
+      global._siteSettingsStore = updated;
     purgeCache();
     return { success: true };
   } catch (err: any) {
@@ -348,7 +352,6 @@ export async function getSolutionsAction(): Promise<Solution[]> {
 
 export async function saveSolutionAction(solution: Solution): Promise<void> {
   requirePersistentStorage();
-  setLocalSolution(solution);
   if (isPostgresConfigured()) {
     try {
       await query(
@@ -385,6 +388,7 @@ export async function saveSolutionAction(solution: Solution): Promise<void> {
       throw new Error(`Could not save solution to PostgreSQL: ${err.message || err}`);
     }
   }
+  setLocalSolution(solution);
   purgeCache();
 }
 
@@ -420,7 +424,6 @@ export async function getProductCategoriesAction(): Promise<ProductCategory[]> {
 
 export async function saveProductAction(product: Product): Promise<void> {
   requirePersistentStorage();
-  setLocalProduct(product);
   if (isPostgresConfigured()) {
     try {
       await query(
@@ -465,6 +468,7 @@ export async function saveProductAction(product: Product): Promise<void> {
       throw new Error(`Could not save product to PostgreSQL: ${err.message || err}`);
     }
   }
+  setLocalProduct(product);
   purgeCache();
 }
 
@@ -769,14 +773,64 @@ export async function getFinancingAction(): Promise<FinancingOption[]> {
   if (isPostgresConfigured()) {
     try {
       const res = await query('SELECT * FROM financing_options WHERE active = true ORDER BY display_order');
-      if (res && res.rows.length > 0) {
+      if (res) {
         return res.rows as FinancingOption[];
       }
     } catch (err) {
       console.warn('Financing query notice:', err);
+      return [];
     }
   }
   return INITIAL_FINANCING;
+}
+
+export async function getAdminFinancingOptionsAction(): Promise<FinancingOption[]> {
+  if (isPostgresConfigured()) {
+    const res = await query('SELECT * FROM financing_options ORDER BY display_order');
+    return (res?.rows || []) as FinancingOption[];
+  }
+  return INITIAL_FINANCING;
+}
+
+export async function saveFinancingOptionAction(option: FinancingOption): Promise<void> {
+  requirePersistentStorage();
+  await query(
+    `INSERT INTO financing_options (
+      id, partner_name, logo_url, interest_rate, max_tenure, min_loan, max_loan,
+      eligibility, features, active, display_order
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+    ON CONFLICT (id) DO UPDATE SET
+      partner_name = EXCLUDED.partner_name,
+      logo_url = EXCLUDED.logo_url,
+      interest_rate = EXCLUDED.interest_rate,
+      max_tenure = EXCLUDED.max_tenure,
+      min_loan = EXCLUDED.min_loan,
+      max_loan = EXCLUDED.max_loan,
+      eligibility = EXCLUDED.eligibility,
+      features = EXCLUDED.features,
+      active = EXCLUDED.active,
+      display_order = EXCLUDED.display_order`,
+    [
+      option.id,
+      option.partner_name,
+      option.logo_url || null,
+      option.interest_rate,
+      option.max_tenure,
+      option.min_loan ?? null,
+      option.max_loan ?? null,
+      option.eligibility,
+      JSON.stringify(option.features || []),
+      option.active,
+      option.display_order,
+    ]
+  );
+  purgeCache();
+}
+
+export async function deleteFinancingOptionAction(id: string): Promise<void> {
+  requirePersistentStorage();
+  await query('DELETE FROM financing_options WHERE id = $1', [id]);
+  purgeCache();
 }
 
 // CALCULATOR SETTINGS

@@ -9,6 +9,7 @@ import {
   FAQ,
   BlogPost,
   Enquiry,
+  FinancingOption,
 } from '../types';
 
 export const SolarService = {
@@ -92,6 +93,9 @@ export const SolarService = {
   saveSubsidy: actions.saveSubsidyAction,
   updateSubsidy: actions.saveSubsidyAction,
   getFinancing: actions.getFinancingAction,
+  getAdminFinancing: actions.getAdminFinancingOptionsAction,
+  saveFinancingOption: actions.saveFinancingOptionAction,
+  deleteFinancingOption: actions.deleteFinancingOptionAction,
 
   // Calculator
   getCalculatorSettings: actions.getCalculatorSettingsAction,

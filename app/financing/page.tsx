@@ -10,14 +10,18 @@ import {
   Building,
   ArrowRight
 } from 'lucide-react';
-import { INITIAL_FINANCING } from '@/lib/data/initial-data';
+import { getFinancingAction } from '@/lib/db/actions';
 
 export const metadata = {
   title: 'Solar Loans & 0% Downpayment Financing | Solaris',
   description: 'Finance your rooftop solar system with collateral-free bank loans starting at 7.00% interest. Low monthly EMI often less than your current electricity bill.',
 };
 
-export default function FinancingPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function FinancingPage() {
+  const financingOptions = await getFinancingAction();
+
   return (
     <div className="space-y-16 py-12">
       {/* Header */}
@@ -52,7 +56,7 @@ export default function FinancingPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {INITIAL_FINANCING.map((fin) => (
+          {financingOptions.map((fin) => (
             <div
               key={fin.id}
               className="bg-white rounded-3xl p-7 border border-slate-200 shadow-sm flex flex-col justify-between space-y-6"
@@ -60,7 +64,7 @@ export default function FinancingPage() {
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 rounded-xl bg-solar-50 text-solar-600 flex items-center justify-center font-bold">
-                    <Building className="w-5 h-5" />
+                    {fin.logo_url ? <img src={fin.logo_url} alt="" className="w-8 h-8 object-contain" /> : <Building className="w-5 h-5" />}
                   </div>
                   <h3 className="text-base font-bold text-slate-900 leading-snug">
                     {fin.partner_name}
@@ -78,7 +82,7 @@ export default function FinancingPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-500">Loan Range:</span>
-                    <span className="font-bold text-slate-900">Up to ₹{fin.max_loan ? (fin.max_loan / 100000) : 10} Lakhs</span>
+                    <span className="font-bold text-slate-900">{fin.min_loan ? `₹${fin.min_loan.toLocaleString('en-IN')} – ` : ''}{fin.max_loan ? `₹${fin.max_loan.toLocaleString('en-IN')}` : 'Contact for limit'}</span>
                   </div>
                 </div>
 
@@ -102,6 +106,9 @@ export default function FinancingPage() {
             </div>
           ))}
         </div>
+        {financingOptions.length === 0 && (
+          <p className="text-center text-sm text-slate-500 py-8">Financing partner details are currently unavailable. Contact us for assistance.</p>
+        )}
       </section>
 
       {/* Documents Required */}
