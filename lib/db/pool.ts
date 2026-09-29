@@ -78,12 +78,44 @@ export async function query<R extends QueryResultRow = any>(
   }
 }
 
+import { isSupabaseConfigured, getSupabaseAdmin } from '../supabase';
+
 export async function testConnection(): Promise<{
   configured: boolean;
   connected: boolean;
   host: string;
   error?: string;
 }> {
+  // 1. Prefer Supabase if configured
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseAdmin();
+      if (supabase) {
+        const { error } = await supabase.from('site_settings').select('id').limit(1);
+        if (!error) {
+          let hostName = 'Supabase Cloud';
+          try {
+            hostName = `Supabase (${new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).hostname})`;
+          } catch {}
+          return {
+            configured: true,
+            connected: true,
+            host: hostName,
+          };
+        } else {
+          return {
+            configured: true,
+            connected: false,
+            host: 'Supabase Cloud',
+            error: error.message,
+          };
+        }
+      }
+    } catch (err: any) {
+      console.warn('Supabase test connection notice:', err);
+    }
+  }
+
   const configurationError = getHostedDatabaseConfigurationError();
   if (configurationError) {
     return {
@@ -99,10 +131,11 @@ export async function testConnection(): Promise<{
     return {
       configured: false,
       connected: false,
-      host: 'Not Configured (DATABASE_URL missing)',
-      error: 'DATABASE_URL environment variable is not defined on this server.',
+      host: 'Not Configured (Supabase / DATABASE_URL missing)',
+      error: 'Database is not configured. Set Supabase credentials or DATABASE_URL.',
     };
   }
+
 
   let sanitizedHost = 'configured';
   try {
