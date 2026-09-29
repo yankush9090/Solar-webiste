@@ -18,21 +18,22 @@ import {
 } from '../types';
 
 export const INITIAL_SITE_SETTINGS: SiteSettings = {
-  company_name: '',
-  tagline: '',
-  logo_url: '',
-  favicon_url: '',
-  phone_number: '',
-  whatsapp_number: '',
-  email: '',
-  address: '',
-  working_hours: '',
-  google_maps_url: '',
-  facebook_url: '',
-  instagram_url: '',
-  linkedin_url: '',
-  youtube_url: '',
+  company_name: 'Maati Energy',
+  tagline: 'Sustainable. Smart. Indian.',
+  logo_url: '/images/logo.png',
+  favicon_url: '/favicon.ico',
+  phone_number: '+91 7337011811',
+  whatsapp_number: '+91 9121086779',
+  email: 'info@maatienergy.com',
+  address: '10-377-13/A satya raghavendra nagar colony, malkajgiri\nsecundrabad 500007',
+  working_hours: '10am - 8pm',
+  google_maps_url: 'https://maps.google.com',
+  facebook_url: 'https://facebook.com',
+  instagram_url: 'https://instagram.com',
+  linkedin_url: 'https://linkedin.com',
+  youtube_url: 'https://youtube.com',
 };
+
 
 export const INITIAL_STATS: HomepageStat[] = [
   { id: '1', label: 'Projects Completed', value: '550+', display_order: 1, active: true },
